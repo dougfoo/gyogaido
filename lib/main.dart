@@ -12,12 +12,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Gyu Gai Do',
+      title: 'Gyo Gai Do',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 178, 66, 25)),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Gyu Gai Do'),
+      home: const MyHomePage(title: 'Gyo Gai Do'),
     );
   }
 }
@@ -33,9 +33,28 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final PageController _pageController = PageController();
+  int _currentPage = 0;
 
   void _goToFishScanner() {
     _pageController.jumpToPage(1);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController.addListener(() {
+      if (_pageController.page == _pageController.initialPage - 1) {
+        _pageController.jumpToPage(3);
+      } else if (_pageController.page == 4) {
+        _pageController.jumpToPage(0);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -47,6 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: PageView(
         controller: _pageController,
+        physics: const BouncingScrollPhysics(), // Ensure physics allows swiping both ways
         children: <Widget>[
           // First screen: current screen
           Center(
