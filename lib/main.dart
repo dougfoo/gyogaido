@@ -3,11 +3,11 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'fish_card.dart'; // Import the new file
 
 void main() {
-  runApp(const MyApp());
+  runApp(const GyoGaiDoApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class GyoGaiDoApp extends StatelessWidget {
+  const GyoGaiDoApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   'You have entered the greatest sushi app in the world:',
                   style: TextStyle(fontSize: 30), 
                 ),
-                Image.asset('images/fish_sushi.jpg'),
+                Image.asset('assets/images/fish_sushi.jpg'),
               ],
             ),
           ),
