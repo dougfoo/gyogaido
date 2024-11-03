@@ -62,7 +62,7 @@ class FishCard extends StatelessWidget {
                     width: imageWidth,
                     height: height * imageHeightFactor,
                     child: Image.asset(
-                      'assets/images/fish_thumbnail.png', // Replace with your image asset
+                      'assets/images/fish_sushi.jpg', // Replace with your image asset
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -142,7 +142,7 @@ class FullScreenFishCard extends StatelessWidget {
               Row(
                 children: <Widget>[
                   Image.asset(
-                    'assets/images/fish_thumbnail.png', // Replace with your image asset
+                    'assets/images/fish_sushi.jpg', // Replace with your image asset
                     width: 100,
                     height: 100,
                     fit: BoxFit.cover,
@@ -156,11 +156,14 @@ class FullScreenFishCard extends StatelessWidget {
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 5),
+                      // todo: replace with actual description
+                      // todo: fix non-wrap issue
                       const Text(
                         'Description of the fish. This is a placeholder text to simulate a longer description that spans multiple lines.',
                         style: TextStyle(fontSize: 14),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
+                        softWrap: true,
                       ),
                     ],
                   ),
@@ -176,6 +179,7 @@ class FullScreenFishCard extends StatelessWidget {
               const Text('Common aliases: alias1, alias2, alias3, alias4, alias5'),
               const Text('Scientific name: scientificname'),
               const Text('Japanese name: romaji (日本語)'),
+              const Text('Ways to eat: sushi, sashimi, grilled, fried, steamed'),
               const Text('Lifespan: 5yr 3mo'),
               const Text('Size: 5in 12cm'),
               const Text('Weight: 5lb 2kg'),
@@ -200,7 +204,7 @@ class FullScreenFishCard extends StatelessWidget {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Image.asset(
-                      'assets/images/fish_sushi.jpg', // Replace with your image asset
+                      'assets/images/fish_sushi2.jpg', // Replace with your image asset
                       height: 100,
                       fit: BoxFit.cover,
                     ),
@@ -213,7 +217,7 @@ class FullScreenFishCard extends StatelessWidget {
                 children: <Widget>[
                   Expanded(
                     child: Image.asset(
-                      'assets/images/wild_fish.png', // Replace with your image asset
+                      'assets/images/wild_fish.jpg', // Replace with your image asset
                       height: 100,
                       fit: BoxFit.cover,
                     ),
@@ -221,7 +225,7 @@ class FullScreenFishCard extends StatelessWidget {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Image.asset(
-                      'assets/images/wild_fish.png', // Replace with your image asset
+                      'assets/images/wild_fish2.jpg', // Replace with your image asset
                       height: 100,
                       fit: BoxFit.cover,
                     ),
