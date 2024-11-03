@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'fish_views.dart';
-import 'fish_card.dart'; // Import the new file
+import 'fish_cam.dart';
 
 void main() {
   runApp(const GyoGaiDoApp());
 }
+
+// todo:
+//   fix so scroll left also works
+//   fix help to bring up info (change to info icon as well) 
+//   implement camera 
 
 class GyoGaiDoApp extends StatelessWidget {
   const GyoGaiDoApp({super.key});
@@ -154,7 +159,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ]            ),
           ),
           // Second screen: FishScanner
-          const FishScanner(),
+          FishScanner(),
           // Third screen: FishFavorites
           const FishFavorites(),
           // Fourth screen: FishLibrary
@@ -163,8 +168,8 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _onItemTapped(1),
-        tooltip: 'Help',
-        child: const FaIcon(FontAwesomeIcons.question),
+        tooltip: 'Scan',
+        child: const FaIcon(FontAwesomeIcons.photoFilm),
       ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.blue, // Set the background color to blue

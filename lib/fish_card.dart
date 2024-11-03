@@ -3,6 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+// todo list
+//  - add button to toggle "add to favorites"
+//  - 
 
 enum ImageSize { noshow, small, medium, large }
 
