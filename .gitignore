@@ -2,7 +2,12 @@
 *.class
 *.log
 *.pyc
+# AutoGen
 *.swp
+*.cc
+*.h
+*.cmake
+# xxx
 .DS_Store
 .atom/
 .buildlog/
