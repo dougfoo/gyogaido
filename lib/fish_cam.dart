@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:googleapis/vision/v1.dart' as vision;
 import 'package:googleapis_auth/auth_io.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class FishScanner extends StatefulWidget {
   @override
@@ -35,10 +36,12 @@ class _FishScannerState extends State<FishScanner> {
     print ("enter _identifyImage");
 
     final scopes = [vision.VisionApi.cloudPlatformScope];
+    final credentialsJson = dotenv.env['GOOGLE_CLOUD_CREDENTIALS']!;
+    final credentials = ServiceAccountCredentials.fromJson(credentialsJson);
     final client = await clientViaServiceAccount(credentials, scopes);
 
     final visionApi = vision.VisionApi(client);
-    print ("visiion Api ${visionApi.toString()}");
+    print ("vision Api ${visionApi.toString()}");
     final imageBytes = await image.readAsBytes();  // gets stuck here why ?
     print ("size of image bytes: ${imageBytes}");
 
