@@ -249,9 +249,9 @@ class FullScreenFishCard extends StatelessWidget {
                   onPressed: () async {
                     // Open Google search for the fish by "unique name"
                     final query = 'Fish $index';
-                    final url = 'https://www.google.com/search?q=$query';
-                    if (await canLaunch(url)) {
-                      await launch(url);
+                    final url = Uri.parse('https://www.google.com/search?q=$query');
+                    if (await canLaunchUrl(url)) {
+                      await launchUrl(url);
                     } else {
                       throw 'Could not launch $url';
                     }
