@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart';
-import 'package:googleapis/vision/v1.dart' as vision;
-import 'package:googleapis_auth/auth_io.dart';
+// import 'package:googleapis/vision/v1.dart' as vision;
+// import 'package:googleapis_auth/auth_io.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class FishScanner extends StatefulWidget {
@@ -13,70 +13,57 @@ class FishScanner extends StatefulWidget {
 }
 
 class _FishScannerState extends State<FishScanner> {
-  File? _image;
+  XFile? _image;
   String _result = '';
   final picker = ImagePicker();
 
   Future<void> _getImage() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.camera);
-  
+    XFile? pickedFile;
+    if (kIsWeb) {
+      pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    } else {
+      pickedFile = await picker.pickImage(source: ImageSource.camera);
+    }
+
     setState(() {
       if (pickedFile != null) {
-        _image = File(pickedFile.path);
-        print ('Uploaded image');
-        _identifyImage(_image!);
-        print ('Returned from _identifyImage');
+        _image = pickedFile;
+        print('Uploaded image');
+        if (!kIsWeb) {
+          _identifyImage(pickedFile);
+        }
+        print('Returned from _identifyImage');
       } else {
         print('No image selected.');
       }
     });
   }
 
-  Future<void> _identifyImage(File image) async {
-    print ("enter _identifyImage");
+  Future<void> _identifyImage(XFile image) async {
+    print("enter _identifyImage");
+    // Only run this on mobile/desktop, not web
+    if (kIsWeb) return;
 
-    final scopes = [vision.VisionApi.cloudPlatformScope];
-    final credentialsJson = dotenv.env['GOOGLE_CLOUD_CREDENTIALS']!;
-    final credentials = ServiceAccountCredentials.fromJson(credentialsJson);
-    final client = await clientViaServiceAccount(credentials, scopes);
-
-    final visionApi = vision.VisionApi(client);
-    print ("vision Api ${visionApi.toString()}");
-    final imageBytes = await image.readAsBytes();  // gets stuck here why ?
-    print ("size of image bytes: ${imageBytes}");
-
-    final base64Image = base64Encode(imageBytes);
-
-    final request = vision.BatchAnnotateImagesRequest.fromJson({
-      'requests': [
-        {
-          'image': {'content': base64Image},
-          'features': [
-            {'type': 'LABEL_DETECTION', 'maxResults': 10}
-          ]
-        }
-      ]
-    });
-
-    final response = await visionApi.images.annotate(request);
-
-    setState(() {
-      _result = response.responses!.first.labelAnnotations!
-          .map((label) => label.description)
-          .join(', ');
-    });
-
-    // Print debug message with image information
-    print('Uploaded image information:');
-    response.responses!.first.labelAnnotations!.forEach((label) {
-      print('Description: ${label.description}, Score: ${label.score}');
-    });
-
-    client.close();
+    // Uncomment and implement your Google Vision API logic here for mobile/desktop
+    // final imageBytes = await image.readAsBytes();
+    // final base64Image = base64Encode(imageBytes);
+    // ...
   }
 
   @override
   Widget build(BuildContext context) {
+    Widget imageWidget;
+    if (_image == null) {
+      imageWidget = const Text('No image selected.');
+    } else if (kIsWeb) {
+      imageWidget = Image.network(_image!.path);
+    } else {
+      imageWidget = Image.file(
+        // ignore: prefer_const_constructors
+        File(_image!.path),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Fish Scanner'),
@@ -85,11 +72,7 @@ class _FishScannerState extends State<FishScanner> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            _image == null
-                ? const Text('No image selected.')
-                : kIsWeb
-                  ? Image.network(_image!.path)
-                  : Image.file(_image!),
+            imageWidget,
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _getImage,
