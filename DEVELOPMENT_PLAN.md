@@ -14,7 +14,7 @@ Transform the current Flutter app skeleton into a fully functional fish identifi
 
 ### ❌ Missing Core Features
 - Fish database/data models
-- Actual fish identification logic
+- Actual fish identification logic using Google Vision API integration
 - Favorites persistence 
 - Real fish data (currently all placeholder)
 - Google Vision API integration
@@ -26,7 +26,7 @@ Transform the current Flutter app skeleton into a fully functional fish identifi
 ### Fish Data Model
 ```dart
 class Fish {
-  String id;                    // Local database primary key
+  String id;
   String uniqueName;
   String description;
   List<String> commonAliases;
@@ -38,18 +38,16 @@ class Fish {
   String weight;
   List<String> habitats;
   List<String> waysToEat;
-  
-  // Local asset paths
-  List<String> sushiImagePaths;
-  List<String> wildImagePaths;
-  String habitatMapImagePath;
+  List<String> sushiImages;
+  List<String> wildImages;
+  String habitatMapImage;
 }
 ```
 
-### Storage Strategy - Local Device Storage
-- **Primary Storage: SQLite** - Local database using sqflite for fish data
-- **Image Storage: Local Assets** - Fish images bundled with app in assets/
-- **User Data: SharedPreferences** - Store favorites and app settings locally
+### Storage Strategy
+- SQLite (sqflite) for offline-first approach
+- JSON assets for initial fish database
+- Cloud Firestore for future sync capabilities
 
 ### Fish Identification Strategy
 **Phase 1 - MVP Approach:**
@@ -74,11 +72,11 @@ class Fish {
 
 ## Phase 1: Foundation (Weeks 1-3)
 ### Core Infrastructure
-1. **Local Database & Fish Data Model**
-   - Create Fish model class with local storage properties
+1. **Fish Data Model & Database**
+   - Create Fish model class with all properties
    - Implement SQLite database with sqflite
-   - Create database service layer for CRUD operations
-   - Bundle initial fish dataset (10-15 common species) with app assets
+   - Create database service layer
+   - Add initial fish dataset (10-15 common species)
 
 2. **State Management**
    - Add Provider or Riverpod for app state
@@ -94,13 +92,10 @@ class Fish {
 ### Dependencies to Add
 ```yaml
 dependencies:
-  # Local storage
   sqflite: ^2.3.0
-  path: ^1.8.3
-  
-  # State management
-  provider: ^6.1.1
+  provider: ^6.1.1  # or riverpod
   shared_preferences: ^2.2.2
+  path: ^1.8.3
 ```
 
 ## Phase 2: Core Features (Weeks 4-6)
@@ -228,9 +223,6 @@ dependencies:
 - Progressive image loading with placeholders
 
 ## Future Enhancements (Post-MVP)
-- **Cloud Storage & Sync**: Firebase/Firestore for real-time updates and user data sync
-- **Community Features**: User-submitted fish photos, ratings, and reviews
-- **Advanced Analytics**: Usage tracking and fish identification accuracy metrics
 - Custom ML model for fish-specific recognition
 - Social features (sharing catches, community ID)
 - Integration with fishing/sushi restaurant databases
