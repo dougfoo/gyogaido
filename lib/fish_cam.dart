@@ -1,11 +1,11 @@
-import 'dart:convert';
+// import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart';
 // import 'package:googleapis/vision/v1.dart' as vision;
 // import 'package:googleapis_auth/auth_io.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+// import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class FishScanner extends StatefulWidget {
   @override
