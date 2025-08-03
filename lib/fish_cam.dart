@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart';
+import 'utils/logger.dart';
 // import 'package:googleapis/vision/v1.dart' as vision;
 // import 'package:googleapis_auth/auth_io.dart';
 // import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -30,19 +31,19 @@ class _FishScannerState extends State<FishScanner> {
     setState(() {
       if (pickedFile != null) {
         _image = pickedFile;
-        print('Uploaded image');
+        Logger.info('Uploaded image', 'FishScanner');
         if (!kIsWeb) {
           _identifyImage(pickedFile);
         }
-        print('Returned from _identifyImage');
+        Logger.info('Returned from _identifyImage', 'FishScanner');
       } else {
-        print('No image selected.');
+        Logger.warning('No image selected.', 'FishScanner');
       }
     });
   }
 
   Future<void> _identifyImage(XFile image) async {
-    print("enter _identifyImage");
+    Logger.debug('enter _identifyImage', 'FishScanner');
     // Only run this on mobile/desktop, not web
     if (kIsWeb) return;
 

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import '../models/fish.dart';
+import '../utils/logger.dart';
 
 /// Database helper class for managing SQLite operations
 /// 
@@ -62,7 +63,7 @@ class DatabaseHelper {
 
   /// Create database tables
   Future<void> _onCreate(Database db, int version) async {
-    print('Creating database tables...');
+    Logger.info('Creating database tables...', 'DatabaseHelper');
     
     await db.execute('''
       CREATE TABLE $fishTable (
@@ -93,7 +94,7 @@ class DatabaseHelper {
       CREATE INDEX idx_fish_scientific ON $fishTable($columnScientificName)
     ''');
 
-    print('Database tables created successfully');
+    Logger.info('Database tables created successfully', 'DatabaseHelper');
     
     // Load initial data
     await _loadInitialData(db);
@@ -101,7 +102,7 @@ class DatabaseHelper {
 
   /// Handle database upgrades
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    print('Upgrading database from version $oldVersion to $newVersion');
+    Logger.info('Upgrading database from version $oldVersion to $newVersion', 'DatabaseHelper');
     
     // Handle future database migrations here
     if (oldVersion < 2) {
@@ -111,7 +112,7 @@ class DatabaseHelper {
 
   /// Load initial fish data from JSON assets
   Future<void> _loadInitialData(Database db) async {
-    print('Loading initial fish data from assets...');
+    Logger.info('Loading initial fish data from assets...', 'DatabaseHelper');
     
     try {
       // Load JSON data from assets
@@ -119,7 +120,7 @@ class DatabaseHelper {
       final Map<String, dynamic> jsonData = json.decode(jsonString);
       final List<dynamic> fishList = jsonData['fish_database'] as List<dynamic>;
       
-      print('Found ${fishList.length} fish species in JSON');
+      Logger.info('Found ${fishList.length} fish species in JSON', 'DatabaseHelper');
       
       // Insert each fish into the database
       final Batch batch = db.batch();
@@ -131,15 +132,15 @@ class DatabaseHelper {
           batch.insert(fishTable, _fishToDbMap(fish));
           insertCount++;
         } catch (e) {
-          print('Error inserting fish: $e');
+          Logger.error('Error inserting fish: $e', 'DatabaseHelper', e);
         }
       }
       
       await batch.commit(noResult: true);
-      print('Successfully inserted $insertCount fish species into database');
+      Logger.info('Successfully inserted $insertCount fish species into database', 'DatabaseHelper');
       
     } catch (e) {
-      print('Error loading initial data: $e');
+      Logger.error('Error loading initial data: $e', 'DatabaseHelper', e);
       rethrow;
     }
   }
@@ -329,7 +330,7 @@ class DatabaseHelper {
 
   /// Reinitialize database (for development/testing)
   Future<void> reinitializeDatabase() async {
-    print('Reinitializing database...');
+    Logger.info('Reinitializing database...', 'DatabaseHelper');
     
     final String path = join(await getDatabasesPath(), _databaseName);
     
@@ -345,7 +346,7 @@ class DatabaseHelper {
     // Recreate database
     _database = await _initDatabase();
     
-    print('Database reinitialized successfully');
+    Logger.info('Database reinitialized successfully', 'DatabaseHelper');
   }
 
   /// Close the database

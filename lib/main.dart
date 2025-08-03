@@ -8,6 +8,7 @@ import 'providers/fish_provider.dart';
 import 'providers/favorites_provider.dart';
 import 'providers/app_state_provider.dart';
 import 'services/fish_service.dart';
+import 'utils/logger.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -78,7 +79,7 @@ class _AppInitializerState extends State<AppInitializer> {
         appStateProvider.initializeApp(),
       ]);
     } catch (e) {
-      print('Error initializing providers: $e');
+      Logger.error('Error initializing providers: $e', 'main', e);
     }
   }
 

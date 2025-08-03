@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/fish.dart';
+import '../utils/logger.dart';
 
 /// Provider class for managing general app state
 /// 
@@ -176,10 +177,10 @@ class AppStateProvider extends ChangeNotifier {
       
       await Future.delayed(const Duration(milliseconds: 500)); // Simulate loading
       
-      print('App initialized successfully');
+      Logger.info('App initialized successfully', 'AppStateProvider');
     } catch (e) {
       setAppError('Failed to initialize app: $e');
-      print('Error initializing app: $e');
+      Logger.error('Error initializing app: $e', 'AppStateProvider', e);
     } finally {
       setAppLoading(false);
     }
@@ -208,10 +209,10 @@ class AppStateProvider extends ChangeNotifier {
           }
           break;
         default:
-          print('Unknown deep link route: $route');
+          Logger.warning('Unknown deep link route: $route', 'AppStateProvider');
       }
     } catch (e) {
-      print('Error handling deep link: $e');
+      Logger.error('Error handling deep link: $e', 'AppStateProvider', e);
       setAppError('Failed to navigate to requested page');
     }
   }

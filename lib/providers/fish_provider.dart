@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/fish.dart';
 import '../services/fish_service.dart';
+import '../utils/logger.dart';
 
 /// Provider class for managing fish data state
 /// 
@@ -58,10 +59,10 @@ class FishProvider extends ChangeNotifier {
       _filteredFish = List.from(_allFish);
       _searchResults = List.from(_allFish);
       
-      print('Loaded ${_allFish.length} fish species');
+      Logger.info('Loaded ${_allFish.length} fish species', 'FishProvider');
     } catch (e) {
       _setError('Failed to load fish data: $e');
-      print('Error loading fish: $e');
+      Logger.error('Error loading fish: $e', 'FishProvider', e);
     } finally {
       _setLoading(false);
     }
@@ -82,10 +83,10 @@ class FishProvider extends ChangeNotifier {
 
     try {
       _searchResults = await FishService.searchFish(_currentSearchQuery);
-      print('Found ${_searchResults.length} fish matching "$_currentSearchQuery"');
+      Logger.info('Found ${_searchResults.length} fish matching "$_currentSearchQuery"', 'FishProvider');
     } catch (e) {
       _setError('Search failed: $e');
-      print('Error searching fish: $e');
+      Logger.error('Error searching fish: $e', 'FishProvider', e);
     } finally {
       _setLoading(false);
     }
@@ -131,10 +132,10 @@ class FishProvider extends ChangeNotifier {
       }
 
       _filteredFish = filtered;
-      print('Applied filters: ${_filteredFish.length} fish remaining');
+      Logger.info('Applied filters: ${_filteredFish.length} fish remaining', 'FishProvider');
     } catch (e) {
       _setError('Filter failed: $e');
-      print('Error applying filters: $e');
+      Logger.error('Error applying filters: $e', 'FishProvider', e);
     } finally {
       _setLoading(false);
     }

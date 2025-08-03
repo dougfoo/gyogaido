@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/fish.dart';
 import '../services/favorites_service.dart';
+import '../utils/logger.dart';
 
 /// Provider class for managing favorite fish state
 /// 
@@ -40,10 +41,10 @@ class FavoritesProvider extends ChangeNotifier {
       // Load favorite fish objects
       _favoriteFish = await FavoritesService.getFavoriteFish();
       
-      print('Loaded ${_favoriteIds.length} favorite fish');
+      Logger.info('Loaded ${_favoriteIds.length} favorite fish', 'FavoritesProvider');
     } catch (e) {
       _setError('Failed to load favorites: $e');
-      print('Error loading favorites: $e');
+      Logger.error('Error loading favorites: $e', 'FavoritesProvider', e);
     } finally {
       _setLoading(false);
     }
@@ -59,13 +60,13 @@ class FavoritesProvider extends ChangeNotifier {
         // Reload favorite fish to get the updated list
         await _reloadFavoriteFish();
         notifyListeners();
-        print('Added fish $fishId to favorites');
+        Logger.info('Added fish $fishId to favorites', 'FavoritesProvider');
       }
       
       return success;
     } catch (e) {
       _setError('Failed to add to favorites: $e');
-      print('Error adding to favorites: $e');
+      Logger.error('Error adding to favorites: $e', 'FavoritesProvider', e);
       return false;
     }
   }
@@ -80,13 +81,13 @@ class FavoritesProvider extends ChangeNotifier {
         // Remove from favorite fish list
         _favoriteFish.removeWhere((fish) => fish.id == fishId);
         notifyListeners();
-        print('Removed fish $fishId from favorites');
+        Logger.info('Removed fish $fishId from favorites', 'FavoritesProvider');
       }
       
       return success;
     } catch (e) {
       _setError('Failed to remove from favorites: $e');
-      print('Error removing from favorites: $e');
+      Logger.error('Error removing from favorites: $e', 'FavoritesProvider', e);
       return false;
     }
   }
@@ -121,7 +122,7 @@ class FavoritesProvider extends ChangeNotifier {
       return await FavoritesService.getRecentlyAddedFavorites(limit: limit);
     } catch (e) {
       _setError('Failed to get recent favorites: $e');
-      print('Error getting recent favorites: $e');
+      Logger.error('Error getting recent favorites: $e', 'FavoritesProvider', e);
       return [];
     }
   }
@@ -135,13 +136,13 @@ class FavoritesProvider extends ChangeNotifier {
         _favoriteIds.clear();
         _favoriteFish.clear();
         notifyListeners();
-        print('Cleared all favorites');
+        Logger.info('Cleared all favorites', 'FavoritesProvider');
       }
       
       return success;
     } catch (e) {
       _setError('Failed to clear favorites: $e');
-      print('Error clearing favorites: $e');
+      Logger.error('Error clearing favorites: $e', 'FavoritesProvider', e);
       return false;
     }
   }
@@ -152,7 +153,7 @@ class FavoritesProvider extends ChangeNotifier {
       return await FavoritesService.exportFavorites();
     } catch (e) {
       _setError('Failed to export favorites: $e');
-      print('Error exporting favorites: $e');
+      Logger.error('Error exporting favorites: $e', 'FavoritesProvider', e);
       return [];
     }
   }
@@ -165,13 +166,13 @@ class FavoritesProvider extends ChangeNotifier {
       if (success) {
         // Reload favorites to reflect the imported data
         await loadFavorites();
-        print('Imported favorites successfully');
+        Logger.info('Imported favorites successfully', 'FavoritesProvider');
       }
       
       return success;
     } catch (e) {
       _setError('Failed to import favorites: $e');
-      print('Error importing favorites: $e');
+      Logger.error('Error importing favorites: $e', 'FavoritesProvider', e);
       return false;
     }
   }
@@ -184,13 +185,13 @@ class FavoritesProvider extends ChangeNotifier {
       if (addedCount > 0) {
         // Reload favorites to reflect the changes
         await loadFavorites();
-        print('Added $addedCount fish to favorites');
+        Logger.info('Added $addedCount fish to favorites', 'FavoritesProvider');
       }
       
       return addedCount;
     } catch (e) {
       _setError('Failed to add multiple favorites: $e');
-      print('Error adding multiple favorites: $e');
+      Logger.error('Error adding multiple favorites: $e', 'FavoritesProvider', e);
       return 0;
     }
   }
@@ -253,7 +254,7 @@ class FavoritesProvider extends ChangeNotifier {
     try {
       _favoriteFish = await FavoritesService.getFavoriteFish();
     } catch (e) {
-      print('Error reloading favorite fish: $e');
+      Logger.error('Error reloading favorite fish: $e', 'FavoritesProvider', e);
     }
   }
 }
