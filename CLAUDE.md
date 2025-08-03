@@ -23,6 +23,11 @@ Gyo Gai Do (魚外道) is a Flutter mobile application that helps users identify
 - `flutter test test/hello_world_test.dart` - Run specific test file
 - Tests are located in the `test/` directory
 
+### Web Server
+- `python -m http.server 8000` - Start local web server for fish browser
+- Access fish browser at: http://localhost:8000/fish_browser.html
+- Use `start_fish_server.bat` for automatic startup
+
 ## Architecture Overview
 
 ### Main Application Structure

@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 // import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'fish_views.dart';
 import 'fish_cam.dart';
+import 'providers/fish_provider.dart';
+import 'providers/favorites_provider.dart';
+import 'providers/app_state_provider.dart';
+import 'services/fish_service.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize database
+  await FishService.initializeDatabase();
+  
   // await dotenv.load(fileName: ".env");
   runApp(const GyoGaiDoApp());
 }
@@ -19,13 +29,108 @@ class GyoGaiDoApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Gyo Gai Do',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 178, 66, 25)),
-        useMaterial3: true,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AppStateProvider()),
+        ChangeNotifierProvider(create: (_) => FishProvider()),
+        ChangeNotifierProvider(create: (_) => FavoritesProvider()),
+      ],
+      child: MaterialApp(
+        title: 'Gyo Gai Do',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 178, 66, 25)),
+          useMaterial3: true,
+        ),
+        home: const AppInitializer(),
       ),
-      home: const MyHomePage(title: 'Gyo Gai Do'),
+    );
+  }
+}
+
+/// Widget to initialize providers and show loading state
+class AppInitializer extends StatefulWidget {
+  const AppInitializer({super.key});
+
+  @override
+  State<AppInitializer> createState() => _AppInitializerState();
+}
+
+class _AppInitializerState extends State<AppInitializer> {
+  @override
+  void initState() {
+    super.initState();
+    _initializeProviders();
+  }
+
+  Future<void> _initializeProviders() async {
+    try {
+      final fishProvider = Provider.of<FishProvider>(context, listen: false);
+      final favoritesProvider = Provider.of<FavoritesProvider>(context, listen: false);
+      final appStateProvider = Provider.of<AppStateProvider>(context, listen: false);
+
+      // Initialize all providers
+      await Future.wait([
+        fishProvider.initialize(),
+        favoritesProvider.initialize(),
+        appStateProvider.initializeApp(),
+      ]);
+    } catch (e) {
+      print('Error initializing providers: $e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer3<FishProvider, FavoritesProvider, AppStateProvider>(
+      builder: (context, fishProvider, favoritesProvider, appStateProvider, child) {
+        // Show loading screen while initializing
+        if (fishProvider.isLoading || favoritesProvider.isLoading || appStateProvider.isAppLoading) {
+          return const Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Loading fish database...'),
+                ],
+              ),
+            ),
+          );
+        }
+
+        // Show error if initialization failed
+        if (fishProvider.error != null || appStateProvider.appError != null) {
+          return Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error, size: 64, color: Colors.red),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Failed to load app data',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    fishProvider.error ?? appStateProvider.appError ?? 'Unknown error',
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: _initializeProviders,
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        // Show main app when loaded
+        return const MyHomePage(title: 'Gyo Gai Do');
+      },
     );
   }
 }
@@ -161,7 +266,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ]            ),
           ),
           // Second screen: FishScanner
-          FishScanner(),
+          const FishScanner(),
           // Third screen: FishFavorites
           const FishFavorites(),
           // Fourth screen: FishLibrary

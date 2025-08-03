@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gyo Gai Do - Fish Database Browser</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #ff6b35 0%, #ff8e53 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 300;
+        }
+        
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .stats {
+            background: rgba(255,255,255,0.1);
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .fish-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            padding: 30px;
+        }
+        
+        .fish-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: white;
+        }
+        
+        .fish-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        
+        .fish-images {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+            height: 200px;
+        }
+        
+        .fish-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s ease;
+            background: #f5f5f5;
+        }
+        
+        .fish-image:hover {
+            opacity: 0.8;
+        }
+        
+        .image-placeholder {
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 0.8rem;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        .fish-info {
+            padding: 20px;
+        }
+        
+        .fish-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #333;
+            margin: 0 0 5px 0;
+        }
+        
+        .fish-japanese {
+            color: #666;
+            font-size: 1rem;
+            margin: 0 0 10px 0;
+        }
+        
+        .fish-scientific {
+            font-style: italic;
+            color: #888;
+            margin: 0 0 15px 0;
+        }
+        
+        .fish-description {
+            color: #555;
+            line-height: 1.5;
+            margin: 0 0 15px 0;
+        }
+        
+        .fish-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 15px 0 0 0;
+        }
+        
+        .tag {
+            background: #f0f0f0;
+            color: #555;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+        
+        .tag.habitat {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .tag.food {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+        
+        .fish-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+        
+        .detail-item {
+            text-align: center;
+        }
+        
+        .detail-label {
+            font-size: 0.7rem;
+            color: #888;
+            text-transform: uppercase;
+            margin: 0 0 2px 0;
+        }
+        
+        .detail-value {
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+        
+        .error {
+            text-align: center;
+            padding: 50px;
+            color: #d32f2f;
+            background: #ffebee;
+            margin: 20px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>魚外道 Gyo Gai Do</h1>
+            <p>Fish Database Browser</p>
+            <div class="stats" id="stats">
+                <div class="loading">Loading fish database...</div>
+            </div>
+        </div>
+        
+        <div class="fish-grid" id="fishGrid">
+            <div class="loading">Loading fish data...</div>
+        </div>
+    </div>
+
+    <script>
+        async function loadFishDatabase() {
+            try {
+                const response = await fetch('assets/data/fish_database.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                
+                displayStats(data.metadata);
+                displayFishData(data.fish_database);
+                
+            } catch (error) {
+                console.error('Error loading fish database:', error);
+                document.getElementById('fishGrid').innerHTML = 
+                    '<div class="error">Error loading fish database. Please make sure the file exists and is accessible.</div>';
+                document.getElementById('stats').innerHTML = 
+                    '<div class="error">Unable to load database statistics.</div>';
+            }
+        }
+        
+        function displayStats(metadata) {
+            const statsDiv = document.getElementById('stats');
+            statsDiv.innerHTML = `
+                <strong>${metadata.total_species}</strong> fish species available<br>
+                <small>Database version ${metadata.version} • Generated ${new Date(metadata.generated_at).toLocaleDateString()}</small>
+            `;
+        }
+        
+        function displayFishData(fishDatabase) {
+            const fishGrid = document.getElementById('fishGrid');
+            
+            if (!fishDatabase || fishDatabase.length === 0) {
+                fishGrid.innerHTML = '<div class="error">No fish data found in the database.</div>';
+                return;
+            }
+            
+            fishGrid.innerHTML = fishDatabase.map(fish => createFishCard(fish)).join('');
+        }
+        
+        function createFishCard(fish) {
+            const naturalImages = fish.wild_images || [];
+            const sushiImages = fish.sushi_images || [];
+            const allImages = [...naturalImages, ...sushiImages];
+            
+            // Use the first 4 images available
+            const displayImages = allImages.slice(0, 4);
+            
+            // Create image grid - fill empty slots if less than 4 images
+            const imageGrid = Array(4).fill(null).map((_, index) => {
+                if (displayImages[index]) {
+                    return `<img src="${displayImages[index]}" alt="${fish.unique_name}" class="fish-image" onerror="this.parentElement.innerHTML='<div class=\\"image-placeholder\\">Image not found<br><small>${displayImages[index]}</small></div>'">`;
+                } else {
+                    return `<div class="image-placeholder">No image available</div>`;
+                }
+            }).join('');
+            
+            const aliases = fish.common_aliases ? fish.common_aliases.join(', ') : '';
+            const habitats = fish.habitats ? fish.habitats.map(h => `<span class="tag habitat">${h}</span>`).join('') : '';
+            const foods = fish.ways_to_eat ? fish.ways_to_eat.map(f => `<span class="tag food">${f}</span>`).join('') : '';
+            
+            return `
+                <div class="fish-card">
+                    <div class="fish-images">
+                        ${imageGrid}
+                    </div>
+                    <div class="fish-info">
+                        <h2 class="fish-name">${fish.unique_name}</h2>
+                        <p class="fish-japanese">${fish.japanese_name_romaji} (${fish.japanese_name_kanji})</p>
+                        <p class="fish-scientific">${fish.scientific_name}</p>
+                        
+                        <div class="fish-details">
+                            <div class="detail-item">
+                                <p class="detail-label">Size</p>
+                                <p class="detail-value">${fish.size || 'N/A'}</p>
+                            </div>
+                            <div class="detail-item">
+                                <p class="detail-label">Weight</p>
+                                <p class="detail-value">${fish.weight || 'N/A'}</p>
+                            </div>
+                            <div class="detail-item">
+                                <p class="detail-label">Lifespan</p>
+                                <p class="detail-value">${fish.lifespan || 'N/A'}</p>
+                            </div>
+                        </div>
+                        
+                        <p class="fish-description">${fish.description}</p>
+                        
+                        ${aliases ? `<p><strong>Also known as:</strong> ${aliases}</p>` : ''}
+                        
+                        <div class="fish-tags">
+                            ${habitats}
+                            ${foods}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Load the database when the page loads
+        document.addEventListener('DOMContentLoaded', loadFishDatabase);
+    </script>
+</body>
+</html>

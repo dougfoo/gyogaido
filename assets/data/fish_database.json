@@ -1,0 +1,678 @@
+{
+  "fish_database": [
+    {
+      "id": "bluefin_tuna",
+      "unique_name": "Bluefin Tuna",
+      "description": "Bluefin tuna  is a common name used to refer to several species of tuna of the genus Thunnus.",
+      "common_aliases": [
+        "Kuro-maguro",
+        "Maguro",
+        "Hon-maguro"
+      ],
+      "scientific_name": "Thunnus thynnus",
+      "japanese_name_romaji": "Kuro-maguro",
+      "japanese_name_kanji": "黒鮪",
+      "lifespan": "5-15 years",
+      "size": "12-24 in (30-60 cm)",
+      "weight": "2-10 lbs (1-4.5 kg)",
+      "habitats": [
+        "Pacific Ocean",
+        "Atlantic Ocean"
+      ],
+      "ways_to_eat": [
+        "Sashimi",
+        "Nigiri",
+        "Seared",
+        "Tataki"
+      ],
+      "sushi_images": [
+        "assets/images/sushi/bluefin_tuna_nigiri.jpg",
+        "assets/images/sushi/bluefin_tuna_sashimi.jpg"
+      ],
+      "wild_images": [
+        "assets/images/natural/bluefin_tuna_natural_1.jpg",
+        "assets/images/natural/bluefin_tuna_natural_2.jpg"
+      ],
+      "habitat_map_image": "assets/images/maps/bluefin_tuna_habitat.jpg"
+    },
+    {
+      "id": "yellowfin_tuna",
+      "unique_name": "Yellowfin Tuna",
+      "description": "The yellowfin tuna is a species of tuna found in pelagic waters of tropical and subtropical oceans worldwide.",
+      "common_aliases": [
+        "Ahi",
+        "Kihada"
+      ],
+      "scientific_name": "Thunnus albacares",
+      "japanese_name_romaji": "Kihada",
+      "japanese_name_kanji": "黄肌",
+      "lifespan": "5-15 years",
+      "size": "12-24 in (30-60 cm)",
+      "weight": "2-10 lbs (1-4.5 kg)",
+      "habitats": [
+        "Pacific Ocean",
+        "Atlantic Ocean"
+      ],
+      "ways_to_eat": [
+        "Sashimi",
+        "Nigiri",
+        "Grilled",
+        "Steamed"
+      ],
+      "sushi_images": [
+        "assets/images/sushi/yellowfin_tuna_nigiri.jpg",
+        "assets/images/sushi/yellowfin_tuna_sashimi.jpg"
+      ],
+      "wild_images": [
+        "assets/images/natural/yellowfin_tuna_natural_1.jpg",
+        "assets/images/natural/yellowfin_tuna_natural_2.jpg"
+      ],
+      "habitat_map_image": "assets/images/maps/yellowfin_tuna_habitat.jpg"
+    },
+    {
+      "id": "atlantic_salmon",
+      "unique_name": "Atlantic Salmon",
+      "description": "The Atlantic salmon is a species of ray-finned fish in the family Salmonidae. It is the third largest of the Salmonidae, behind Siberian taimen and Pacific Chinook salmon, growing up to 1 m (3.3 ft) i...",
+      "common_aliases": [
+        "Norwegian Salmon",
+        "Sake"
+      ],
+      "scientific_name": "Salmo salar",
+      "japanese_name_romaji": "Sake",
+      "japanese_name_kanji": "鮭",
+      "lifespan": "5-15 years",
+      "size": "12-24 in (30-60 cm)",
+      "weight": "2-10 lbs (1-4.5 kg)",
+      "habitats": [
+        "Pacific Ocean",
+        "Atlantic Ocean"
+      ],
+      "ways_to_eat": [
+        "Sashimi",
+        "Nigiri",
+        "Grilled",
+        "Smoked"
+      ],
+      "sushi_images": [
+        "assets/images/sushi/atlantic_salmon_nigiri.jpg",
+        "assets/images/sushi/atlantic_salmon_sashimi.jpg"
+      ],
+      "wild_images": [
+        "assets/images/natural/atlantic_salmon_natural_1.jpg",
+        "assets/images/natural/atlantic_salmon_natural_2.jpg"
+      ],
+      "habitat_map_image": "assets/images/maps/atlantic_salmon_habitat.jpg"
+    },
+    {
+      "id": "japanese_amberjack",
+      "unique_name": "Japanese Amberjack",
+      "description": "Premium fish with buttery texture and clean taste. Young yellowtail (hamachi) is especially prized for sushi and sashimi.",
+      "common_aliases": [
+        "Hamachi",
+        "Yellowtail",
+        "Buri"
+      ],
+      "scientific_name": "Seriola quinqueradiata",
+      "japanese_name_romaji": "Hamachi",
+      "japanese_name_kanji": "鰤",
+      "lifespan": "5-15 years",
+      "size": "12-24 in (30-60 cm)",
+      "weight": "2-10 lbs (1-4.5 kg)",
+      "habitats": [
+        "Pacific Ocean",
+        "Atlantic Ocean"
+      ],
+      "ways_to_eat": [
+        "Sashimi",
+        "Nigiri",
+        "Grilled",
+        "Teriyaki"
+      ],
+      "sushi_images": [
+        "assets/images/sushi/japanese_amberjack_nigiri.jpg",
+        "assets/images/sushi/japanese_amberjack_sashimi.jpg"
+      ],
+      "wild_images": [
+        "assets/images/natural/japanese_amberjack_natural_1.jpg",
+        "assets/images/natural/japanese_amberjack_natural_2.jpg"
+      ],
+      "habitat_map_image": "assets/images/maps/japanese_amberjack_habitat.jpg"
+    },
+    {
+      "id": "red_sea_bream",
+      "unique_name": "Red Sea Bream",
+      "description": "A species of fish commonly used in Japanese cuisine, particularly sushi and sashimi preparation.",
+      "common_aliases": [
+        "Madai",
+        "Tai",
+        "Sea Bream"
+      ],
+      "scientific_name": "Pagrus major",
+      "japanese_name_romaji": "Madai",
+      "japanese_name_kanji": "真鯛",
+      "lifespan": "5-15 years",
+      "size": "12-24 in (30-60 cm)",
+      "weight": "2-10 lbs (1-4.5 kg)",
+      "habitats": [
+        "Pacific Ocean",
+        "Atlantic Ocean"
+      ],
+      "ways_to_eat": [
+        "Sashimi",
+        "Nigiri",
+        "Steamed",
+        "Grilled"
+      ],
+      "sushi_images": [
+        "assets/images/sushi/red_sea_bream_nigiri.jpg",
+        "assets/images/sushi/red_sea_bream_sashimi.jpg"
+      ],
+      "wild_images": [
+        "assets/images/natural/red_sea_bream_natural_1.jpg",
+        "assets/images/natural/red_sea_bream_natural_2.jpg"
+      ],
+      "habitat_map_image": "assets/images/maps/red_sea_bream_habitat.jpg"
+    },
+    {
+      "id": "atlantic_mackerel",
+      "unique_name": "Atlantic Mackerel",
+      "description": "The Atlantic mackerel, also known as Boston mackerel, Norwegian mackerel, Scottish mackerel or just mackerel, is a species of mackerel found in the temperate waters of the Mediterranean Sea, the Black...",
+      "common_aliases": [
+        "Saba"
+      ],
+      "scientific_name": "Scomber scombrus",
+      "japanese_name_romaji": "Saba",
+      "japanese_name_kanji": "鯖",
+      "lifespan": "5-15 years",
+      "size": "12-24 in (30-60 cm)",
+      "weight": "2-10 lbs (1-4.5 kg)",
+      "habitats": [
+        "Pacific Ocean",
+        "Atlantic Ocean"
+      ],
+      "ways_to_eat": [
+        "Sashimi",
+        "Nigiri",
+        "Grilled",
+        "Pickled"
+      ],
+      "sushi_images": [
+        "assets/images/sushi/atlantic_mackerel_nigiri.jpg",
+        "assets/images/sushi/atlantic_mackerel_sashimi.jpg"
+      ],
+      "wild_images": [
+        "assets/images/natural/atlantic_mackerel_natural_1.jpg",
+        "assets/images/natural/atlantic_mackerel_natural_2.jpg"
+      ],
+      "habitat_map_image": "assets/images/maps/atlantic_mackerel_habitat.jpg"
+    },
+    {
+      "id": "horse_mackerel",
+      "unique_name": "Horse Mackerel",
+      "description": "Horse mackerel is a vague vernacular term for a range of species of fish throughout the English-speaking world. It is commonly applied to pelagic fishes, especially of the Carangidae family, most comm...",
+      "common_aliases": [
+        "Aji"
+      ],
+      "scientific_name": "Trachurus japonicus",
+      "japanese_name_romaji": "Aji",
+      "japanese_name_kanji": "鯵",
+      "lifespan": "5-15 years",
+      "size": "12-24 in (30-60 cm)",
+      "weight": "2-10 lbs (1-4.5 kg)",
+      "habitats": [
+        "Pacific Ocean",
+        "Atlantic Ocean"
+      ],
+      "ways_to_eat": [
+        "Sashimi",
+        "Nigiri",
+        "Grilled",
+        "Steamed"
+      ],
+      "sushi_images": [
+        "assets/images/sushi/horse_mackerel_nigiri.jpg",
+        "assets/images/sushi/horse_mackerel_sashimi.jpg"
+      ],
+      "wild_images": [
+        "assets/images/natural/horse_mackerel_natural_1.jpg",
+        "assets/images/natural/horse_mackerel_natural_2.jpg"
+      ],
+      "habitat_map_image": "assets/images/maps/horse_mackerel_habitat.jpg"
+    },
+    {
+      "id": "japanese_sardine",
+      "unique_name": "Japanese Sardine",
+      "description": "A species of fish commonly used in Japanese cuisine, particularly sushi and sashimi preparation.",
+      "common_aliases": [
+        "Iwashi"
+      ],
+      "scientific_name": "Sardinops melanostictus",
+      "japanese_name_romaji": "Iwashi",
+      "japanese_name_kanji": "鰯",
+      "lifespan": "5-15 years",
+      "size": "12-24 in (30-60 cm)",
+      "weight": "2-10 lbs (1-4.5 kg)",
+      "habitats": [
+        "Pacific Ocean",
+        "Atlantic Ocean"
+      ],
+      "ways_to_eat": [
+        "Sashimi",
+        "Nigiri",
+        "Grilled",
+        "Steamed"
+      ],
+      "sushi_images": [
+        "assets/images/sushi/japanese_sardine_nigiri.jpg",
+        "assets/images/sushi/japanese_sardine_sashimi.jpg"
+      ],
+      "wild_images": [
+        "assets/images/natural/japanese_sardine_natural_1.jpg",
+        "assets/images/natural/japanese_sardine_natural_2.jpg"
+      ],
+      "habitat_map_image": "assets/images/maps/japanese_sardine_habitat.jpg"
+    },
+    {
+      "id": "japanese_sea_bass",
+      "unique_name": "Japanese Sea Bass",
+      "description": "A species of fish commonly used in Japanese cuisine, particularly sushi and sashimi preparation.",
+      "common_aliases": [
+        "Suzuki"
+      ],
+      "scientific_name": "Lateolabrax japonicus",
+      "japanese_name_romaji": "Suzuki",
+      "japanese_name_kanji": "鱸",
+      "lifespan": "5-15 years",
+      "size": "12-24 in (30-60 cm)",
+      "weight": "2-10 lbs (1-4.5 kg)",
+      "habitats": [
+        "Pacific Ocean",
+        "Atlantic Ocean"
+      ],
+      "ways_to_eat": [
+        "Sashimi",
+        "Nigiri",
+        "Grilled",
+        "Steamed"
+      ],
+      "sushi_images": [
+        "assets/images/sushi/japanese_sea_bass_nigiri.jpg",
+        "assets/images/sushi/japanese_sea_bass_sashimi.jpg"
+      ],
+      "wild_images": [
+        "assets/images/natural/japanese_sea_bass_natural_1.jpg",
+        "assets/images/natural/japanese_sea_bass_natural_2.jpg"
+      ],
+      "habitat_map_image": "assets/images/maps/japanese_sea_bass_habitat.jpg"
+    },
+    {
+      "id": "olive_flounder",
+      "unique_name": "Olive Flounder",
+      "description": "A species of fish commonly used in Japanese cuisine, particularly sushi and sashimi preparation.",
+      "common_aliases": [
+        "Hirame"
+      ],
+      "scientific_name": "Paralichthys olivaceus",
+      "japanese_name_romaji": "Hirame",
+      "japanese_name_kanji": "鮃",
+      "lifespan": "5-15 years",
+      "size": "12-24 in (30-60 cm)",
+      "weight": "2-10 lbs (1-4.5 kg)",
+      "habitats": [
+        "Pacific Ocean",
+        "Atlantic Ocean"
+      ],
+      "ways_to_eat": [
+        "Sashimi",
+        "Nigiri",
+        "Grilled",
+        "Steamed"
+      ],
+      "sushi_images": [
+        "assets/images/sushi/olive_flounder_nigiri.jpg",
+        "assets/images/sushi/olive_flounder_sashimi.jpg"
+      ],
+      "wild_images": [
+        "assets/images/natural/olive_flounder_natural_1.jpg",
+        "assets/images/natural/olive_flounder_natural_2.jpg"
+      ],
+      "habitat_map_image": "assets/images/maps/olive_flounder_habitat.jpg"
+    },
+    {
+      "id": "red_snapper",
+      "unique_name": "Red Snapper",
+      "description": "Red snapper is a common name of several fish species. It may refer to:Several species from the genus Lutjanus:\nLutjanus campechanus, Northern red snapper, commonly referred to as red snapper in the Gu...",
+      "common_aliases": [
+        "Tai"
+      ],
+      "scientific_name": "Lutjanus campechanus",
+      "japanese_name_romaji": "Tai",
+      "japanese_name_kanji": "鯛",
+      "lifespan": "5-15 years",
+      "size": "12-24 in (30-60 cm)",
+      "weight": "2-10 lbs (1-4.5 kg)",
+      "habitats": [
+        "Pacific Ocean",
+        "Atlantic Ocean"
+      ],
+      "ways_to_eat": [
+        "Sashimi",
+        "Nigiri",
+        "Grilled",
+        "Steamed"
+      ],
+      "sushi_images": [
+        "assets/images/sushi/red_snapper_nigiri.jpg",
+        "assets/images/sushi/red_snapper_sashimi.jpg"
+      ],
+      "wild_images": [
+        "assets/images/natural/red_snapper_natural_1.jpg",
+        "assets/images/natural/red_snapper_natural_2.jpg"
+      ],
+      "habitat_map_image": "assets/images/maps/red_snapper_habitat.jpg"
+    },
+    {
+      "id": "japanese_eel",
+      "unique_name": "Japanese Eel",
+      "description": "A species of fish commonly used in Japanese cuisine, particularly sushi and sashimi preparation.",
+      "common_aliases": [
+        "Unagi"
+      ],
+      "scientific_name": "Anguilla japonica",
+      "japanese_name_romaji": "Unagi",
+      "japanese_name_kanji": "鰻",
+      "lifespan": "5-15 years",
+      "size": "12-24 in (30-60 cm)",
+      "weight": "2-10 lbs (1-4.5 kg)",
+      "habitats": [
+        "Pacific Ocean",
+        "Atlantic Ocean"
+      ],
+      "ways_to_eat": [
+        "Unagi",
+        "Kabayaki",
+        "Grilled",
+        "Rice Bowl"
+      ],
+      "sushi_images": [
+        "assets/images/sushi/japanese_eel_nigiri.jpg",
+        "assets/images/sushi/japanese_eel_sashimi.jpg"
+      ],
+      "wild_images": [
+        "assets/images/natural/japanese_eel_natural_1.jpg",
+        "assets/images/natural/japanese_eel_natural_2.jpg"
+      ],
+      "habitat_map_image": "assets/images/maps/japanese_eel_habitat.jpg"
+    },
+    {
+      "id": "conger_eel",
+      "unique_name": "Conger Eel",
+      "description": "Conger is a genus of marine congrid eels. It includes some of the largest types of eels, ranging up to two metres or more in length, in the case of the European conger. Large congers have often been o...",
+      "common_aliases": [
+        "Anago"
+      ],
+      "scientific_name": "Conger myriaster",
+      "japanese_name_romaji": "Anago",
+      "japanese_name_kanji": "穴子",
+      "lifespan": "5-15 years",
+      "size": "12-24 in (30-60 cm)",
+      "weight": "2-10 lbs (1-4.5 kg)",
+      "habitats": [
+        "Pacific Ocean",
+        "Atlantic Ocean"
+      ],
+      "ways_to_eat": [
+        "Sashimi",
+        "Nigiri",
+        "Grilled",
+        "Steamed"
+      ],
+      "sushi_images": [
+        "assets/images/sushi/conger_eel_nigiri.jpg",
+        "assets/images/sushi/conger_eel_sashimi.jpg"
+      ],
+      "wild_images": [
+        "assets/images/natural/conger_eel_natural_1.jpg",
+        "assets/images/natural/conger_eel_natural_2.jpg"
+      ],
+      "habitat_map_image": "assets/images/maps/conger_eel_habitat.jpg"
+    },
+    {
+      "id": "japanese_flying_squid",
+      "unique_name": "Japanese Flying Squid",
+      "description": "The Japanese flying squid, Japanese common squid or Pacific flying squid, scientific name Todarodes pacificus, is a squid of the family Ommastrephidae. This animal lives in the northern Pacific Ocean,...",
+      "common_aliases": [
+        "Ika"
+      ],
+      "scientific_name": "Todarodes pacificus",
+      "japanese_name_romaji": "Ika",
+      "japanese_name_kanji": "烏賊",
+      "lifespan": "5-15 years",
+      "size": "12-24 in (30-60 cm)",
+      "weight": "2-10 lbs (1-4.5 kg)",
+      "habitats": [
+        "Pacific Ocean",
+        "Atlantic Ocean"
+      ],
+      "ways_to_eat": [
+        "Sashimi",
+        "Nigiri",
+        "Grilled",
+        "Steamed"
+      ],
+      "sushi_images": [
+        "assets/images/sushi/japanese_flying_squid_nigiri.jpg",
+        "assets/images/sushi/japanese_flying_squid_sashimi.jpg"
+      ],
+      "wild_images": [
+        "assets/images/natural/japanese_flying_squid_natural_1.jpg",
+        "assets/images/natural/japanese_flying_squid_natural_2.jpg"
+      ],
+      "habitat_map_image": "assets/images/maps/japanese_flying_squid_habitat.jpg"
+    },
+    {
+      "id": "giant_pacific_octopus",
+      "unique_name": "Giant Pacific Octopus",
+      "description": "The giant Pacific octopus, also known as the North Pacific giant octopus, is a large marine cephalopod belonging to the genus Enteroctopus and Enteroctopodidae family. Its spatial distribution encompa...",
+      "common_aliases": [
+        "Tako"
+      ],
+      "scientific_name": "Enteroctopus dofleini",
+      "japanese_name_romaji": "Tako",
+      "japanese_name_kanji": "蛸",
+      "lifespan": "5-15 years",
+      "size": "12-24 in (30-60 cm)",
+      "weight": "2-10 lbs (1-4.5 kg)",
+      "habitats": [
+        "Pacific Ocean",
+        "Atlantic Ocean"
+      ],
+      "ways_to_eat": [
+        "Sashimi",
+        "Nigiri",
+        "Grilled",
+        "Steamed"
+      ],
+      "sushi_images": [
+        "assets/images/sushi/giant_pacific_octopus_nigiri.jpg",
+        "assets/images/sushi/giant_pacific_octopus_sashimi.jpg"
+      ],
+      "wild_images": [
+        "assets/images/natural/giant_pacific_octopus_natural_1.jpg",
+        "assets/images/natural/giant_pacific_octopus_natural_2.jpg"
+      ],
+      "habitat_map_image": "assets/images/maps/giant_pacific_octopus_habitat.jpg"
+    },
+    {
+      "id": "kuruma_prawn",
+      "unique_name": "Kuruma Prawn",
+      "description": "A species of fish commonly used in Japanese cuisine, particularly sushi and sashimi preparation.",
+      "common_aliases": [
+        "Ebi"
+      ],
+      "scientific_name": "Penaeus japonicus",
+      "japanese_name_romaji": "Ebi",
+      "japanese_name_kanji": "海老",
+      "lifespan": "5-15 years",
+      "size": "12-24 in (30-60 cm)",
+      "weight": "2-10 lbs (1-4.5 kg)",
+      "habitats": [
+        "Pacific Ocean",
+        "Atlantic Ocean"
+      ],
+      "ways_to_eat": [
+        "Sashimi",
+        "Nigiri",
+        "Grilled",
+        "Steamed"
+      ],
+      "sushi_images": [
+        "assets/images/sushi/kuruma_prawn_nigiri.jpg",
+        "assets/images/sushi/kuruma_prawn_sashimi.jpg"
+      ],
+      "wild_images": [
+        "assets/images/natural/kuruma_prawn_natural_1.jpg",
+        "assets/images/natural/kuruma_prawn_natural_2.jpg"
+      ],
+      "habitat_map_image": "assets/images/maps/kuruma_prawn_habitat.jpg"
+    },
+    {
+      "id": "japanese_scallop",
+      "unique_name": "Japanese Scallop",
+      "description": "A species of fish commonly used in Japanese cuisine, particularly sushi and sashimi preparation.",
+      "common_aliases": [
+        "Hotate"
+      ],
+      "scientific_name": "Patinopecten yessoensis",
+      "japanese_name_romaji": "Hotate",
+      "japanese_name_kanji": "帆立",
+      "lifespan": "5-15 years",
+      "size": "12-24 in (30-60 cm)",
+      "weight": "2-10 lbs (1-4.5 kg)",
+      "habitats": [
+        "Pacific Ocean",
+        "Atlantic Ocean"
+      ],
+      "ways_to_eat": [
+        "Sashimi",
+        "Nigiri",
+        "Grilled",
+        "Steamed"
+      ],
+      "sushi_images": [
+        "assets/images/sushi/japanese_scallop_nigiri.jpg",
+        "assets/images/sushi/japanese_scallop_sashimi.jpg"
+      ],
+      "wild_images": [
+        "assets/images/natural/japanese_scallop_natural_1.jpg",
+        "assets/images/natural/japanese_scallop_natural_2.jpg"
+      ],
+      "habitat_map_image": "assets/images/maps/japanese_scallop_habitat.jpg"
+    },
+    {
+      "id": "sea_urchin",
+      "unique_name": "Sea Urchin",
+      "description": "Sea urchins or urchins are echinoderms in the class Echinoidea. About 950 species live on the seabed, inhabiting all oceans and depth zones from the intertidal zone to deep seas of 5,000 m (16,000 ft)...",
+      "common_aliases": [
+        "Uni"
+      ],
+      "scientific_name": "Strongylocentrotus nudus",
+      "japanese_name_romaji": "Uni",
+      "japanese_name_kanji": "雲丹",
+      "lifespan": "5-15 years",
+      "size": "12-24 in (30-60 cm)",
+      "weight": "2-10 lbs (1-4.5 kg)",
+      "habitats": [
+        "Pacific Ocean",
+        "Atlantic Ocean"
+      ],
+      "ways_to_eat": [
+        "Sashimi",
+        "Nigiri",
+        "Grilled",
+        "Steamed"
+      ],
+      "sushi_images": [
+        "assets/images/sushi/sea_urchin_nigiri.jpg",
+        "assets/images/sushi/sea_urchin_sashimi.jpg"
+      ],
+      "wild_images": [
+        "assets/images/natural/sea_urchin_natural_1.jpg",
+        "assets/images/natural/sea_urchin_natural_2.jpg"
+      ],
+      "habitat_map_image": "assets/images/maps/sea_urchin_habitat.jpg"
+    },
+    {
+      "id": "greater_amberjack",
+      "unique_name": "Greater Amberjack",
+      "description": "The greater amberjack, also known as the allied kingfish, great amberfish, greater yellowtail, jenny lind, sea donkey, purplish amberjack, reef donkey, rock salmon, sailors choice, yellowtail, and yel...",
+      "common_aliases": [
+        "Kanpachi"
+      ],
+      "scientific_name": "Seriola dumerili",
+      "japanese_name_romaji": "Kanpachi",
+      "japanese_name_kanji": "間八",
+      "lifespan": "5-15 years",
+      "size": "12-24 in (30-60 cm)",
+      "weight": "2-10 lbs (1-4.5 kg)",
+      "habitats": [
+        "Pacific Ocean",
+        "Atlantic Ocean"
+      ],
+      "ways_to_eat": [
+        "Sashimi",
+        "Nigiri",
+        "Grilled",
+        "Steamed"
+      ],
+      "sushi_images": [
+        "assets/images/sushi/greater_amberjack_nigiri.jpg",
+        "assets/images/sushi/greater_amberjack_sashimi.jpg"
+      ],
+      "wild_images": [
+        "assets/images/natural/greater_amberjack_natural_1.jpg",
+        "assets/images/natural/greater_amberjack_natural_2.jpg"
+      ],
+      "habitat_map_image": "assets/images/maps/greater_amberjack_habitat.jpg"
+    },
+    {
+      "id": "pacific_saury",
+      "unique_name": "Pacific Saury",
+      "description": "A species of fish commonly used in Japanese cuisine, particularly sushi and sashimi preparation.",
+      "common_aliases": [
+        "Sanma"
+      ],
+      "scientific_name": "Cololabis saira",
+      "japanese_name_romaji": "Sanma",
+      "japanese_name_kanji": "秋刀魚",
+      "lifespan": "5-15 years",
+      "size": "12-24 in (30-60 cm)",
+      "weight": "2-10 lbs (1-4.5 kg)",
+      "habitats": [
+        "Pacific Ocean",
+        "Atlantic Ocean"
+      ],
+      "ways_to_eat": [
+        "Sashimi",
+        "Nigiri",
+        "Grilled",
+        "Steamed"
+      ],
+      "sushi_images": [
+        "assets/images/sushi/pacific_saury_nigiri.jpg",
+        "assets/images/sushi/pacific_saury_sashimi.jpg"
+      ],
+      "wild_images": [
+        "assets/images/natural/pacific_saury_natural_1.jpg",
+        "assets/images/natural/pacific_saury_natural_2.jpg"
+      ],
+      "habitat_map_image": "assets/images/maps/pacific_saury_habitat.jpg"
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "generated_at": "2025-08-03 07:51:41",
+    "total_species": 20,
+    "description": "Fish database for Gyo Gai Do app"
+  }
+}

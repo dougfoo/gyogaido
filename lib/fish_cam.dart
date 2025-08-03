@@ -8,8 +8,10 @@ import 'package:flutter/foundation.dart';
 // import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class FishScanner extends StatefulWidget {
+  const FishScanner({super.key});
+
   @override
-  _FishScannerState createState() => _FishScannerState();
+  State<FishScanner> createState() => _FishScannerState();
 }
 
 class _FishScannerState extends State<FishScanner> {

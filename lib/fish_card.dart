@@ -1,21 +1,25 @@
-// FILE: lib/fish_card.dart - testing plan
+// FILE: lib/fish_card.dart - Real fish data implementation
 
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:provider/provider.dart';
+import 'models/fish.dart';
+import 'providers/favorites_provider.dart';
 
 // todo list
-//  - add button to toggle "add to favorites"
+//  - add button to toggle "add to favorites" ✓
 //  - 
 
 enum ImageSize { noshow, small, medium, large }
 
 class FishCard extends StatelessWidget {
-  final int index;
+  final Fish fish;
   final double height;
   final ImageSize imageSize;
 
   const FishCard({
-    required this.index,
+    super.key,
+    required this.fish,
     this.height = 120,
     this.imageSize = ImageSize.large,
   });
@@ -47,7 +51,7 @@ class FishCard extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (context) => FullScreenFishCard(
-              index: index,
+              fish: fish,
               imageSize: imageSize,
             ),
           ),
@@ -57,16 +61,27 @@ class FishCard extends StatelessWidget {
         message: 'Click for details',
         child: Card(
           child: Container(
-            height: height, // Use the height parameter
+            height: height,
             child: Row(
               children: <Widget>[
-                if (imageSize != ImageSize.noshow) // Conditionally show the image
+                if (imageSize != ImageSize.noshow)
                   Container(
                     width: imageWidth,
                     height: height * imageHeightFactor,
-                    child: Image.asset(
-                      'assets/images/fish_sushi.jpg', // Replace with your image asset
-                      fit: BoxFit.cover,
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.horizontal(left: Radius.circular(8)),
+                      child: Image.asset(
+                        fish.primarySushiImage.isNotEmpty 
+                          ? fish.primarySushiImage 
+                          : 'assets/images/fish_sushi.jpg',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: Colors.grey[300],
+                            child: const Icon(Icons.image_not_supported),
+                          );
+                        },
+                      ),
                     ),
                   ),
                 Expanded(
@@ -76,15 +91,41 @@ class FishCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        Text(
-                          'Fish $index',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                fish.uniqueName,
+                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            Consumer<FavoritesProvider>(
+                              builder: (context, favoritesProvider, child) {
+                                final isFavorite = favoritesProvider.isFavorite(fish.id);
+                                return IconButton(
+                                  icon: Icon(
+                                    isFavorite ? Icons.favorite : Icons.favorite_border,
+                                    color: isFavorite ? Colors.red : Colors.grey,
+                                  ),
+                                  onPressed: () {
+                                    favoritesProvider.toggleFavorite(fish.id);
+                                  },
+                                );
+                              },
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 5),
-                        const Text(
-                          'Description of the fish. This is a placeholder text to simulate a longer description that spans multiple lines.',
-                          style: TextStyle(fontSize: 14),
-                          maxLines: 4,
+                        Text(
+                          fish.japaneseNameRomaji,
+                          style: const TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          fish.description,
+                          style: const TextStyle(fontSize: 12),
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
@@ -121,11 +162,12 @@ class FishCard extends StatelessWidget {
 //    very bottom has a link "google for more" that opens google search for the fish by "unique name" 
 
 class FullScreenFishCard extends StatelessWidget {
-  final int index;
+  final Fish fish;
   final ImageSize imageSize;
 
   const FullScreenFishCard({
-    required this.index,
+    super.key,
+    required this.fish,
     required this.imageSize,
   });
 
@@ -133,7 +175,23 @@ class FullScreenFishCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Fish $index'),
+        title: Text(fish.uniqueName),
+        actions: [
+          Consumer<FavoritesProvider>(
+            builder: (context, favoritesProvider, child) {
+              final isFavorite = favoritesProvider.isFavorite(fish.id);
+              return IconButton(
+                icon: Icon(
+                  isFavorite ? Icons.favorite : Icons.favorite_border,
+                  color: isFavorite ? Colors.red : null,
+                ),
+                onPressed: () {
+                  favoritesProvider.toggleFavorite(fish.id);
+                },
+              );
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -144,31 +202,48 @@ class FullScreenFishCard extends StatelessWidget {
               // Top section
               Row(
                 children: <Widget>[
-                  Image.asset(
-                    'assets/images/fish_sushi.jpg', // Replace with your image asset
-                    width: 100,
-                    height: 100,
-                    fit: BoxFit.cover,
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.asset(
+                      fish.primaryWildImage.isNotEmpty 
+                        ? fish.primaryWildImage 
+                        : 'assets/images/fish_sushi.jpg',
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: 100,
+                          height: 100,
+                          color: Colors.grey[300],
+                          child: const Icon(Icons.image_not_supported),
+                        );
+                      },
+                    ),
                   ),
                   const SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        'Fish $index',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 5),
-                      // todo: replace with actual description
-                      // todo: fix non-wrap issue
-                      const Text(
-                        'Description of the fish. This is a placeholder text to simulate a longer description that spans multiple lines.',
-                        style: TextStyle(fontSize: 14),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        softWrap: true,
-                      ),
-                    ],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          fish.uniqueName,
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          fish.japaneseNameRomaji + (fish.japaneseNameKanji.isNotEmpty ? ' (${fish.japaneseNameKanji})' : ''),
+                          style: const TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          fish.description,
+                          style: const TextStyle(fontSize: 14),
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -179,14 +254,14 @@ class FullScreenFishCard extends StatelessWidget {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
-              const Text('Common aliases: alias1, alias2, alias3, alias4, alias5'),
-              const Text('Scientific name: scientificname'),
-              const Text('Japanese name: romaji (日本語)'),
-              const Text('Ways to eat: sushi, sashimi, grilled, fried, steamed'),
-              const Text('Lifespan: 5yr 3mo'),
-              const Text('Size: 5in 12cm'),
-              const Text('Weight: 5lb 2kg'),
-              const Text('Habitats: country1, country2, country3, country4, country5, country6, country7, country8'),
+              Text('Common aliases: ${fish.aliasesString}'),
+              Text('Scientific name: ${fish.scientificName}'),
+              Text('Japanese name: ${fish.japaneseNameRomaji} (${fish.japaneseNameKanji})'),
+              Text('Ways to eat: ${fish.waysToEatString}'),
+              Text('Lifespan: ${fish.lifespan}'),
+              Text('Size: ${fish.size}'),
+              Text('Weight: ${fish.weight}'),
+              Text('Habitats: ${fish.habitatString}'),
               const SizedBox(height: 20),
               // Bottom section
               const Text(
@@ -247,8 +322,8 @@ class FullScreenFishCard extends StatelessWidget {
               Center(
                 child: TextButton(
                   onPressed: () async {
-                    // Open Google search for the fish by "unique name"
-                    final query = 'Fish $index';
+                    // Open Google search for the fish by unique name
+                    final query = Uri.encodeComponent('${fish.uniqueName} ${fish.scientificName} fish');
                     final url = Uri.parse('https://www.google.com/search?q=$query');
                     if (await canLaunchUrl(url)) {
                       await launchUrl(url);

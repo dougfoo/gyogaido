@@ -1,0 +1,229 @@
+import 'package:shared_preferences/shared_preferences.dart';
+import '../models/fish.dart';
+import 'fish_service.dart';
+
+/// Service class for managing user's favorite fish
+/// 
+/// This class handles persistence of favorite fish using SharedPreferences
+/// and provides methods to add, remove, and retrieve favorites.
+class FavoritesService {
+  static const String _favoritesKey = 'favorite_fish_ids';
+
+  /// Get the list of favorite fish IDs
+  static Future<Set<String>> getFavoriteIds() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final List<String> favoriteIds = prefs.getStringList(_favoritesKey) ?? [];
+      return favoriteIds.toSet();
+    } catch (e) {
+      print('Error getting favorite IDs: $e');
+      return {};
+    }
+  }
+
+  /// Check if a fish is in favorites
+  static Future<bool> isFavorite(String fishId) async {
+    try {
+      final favoriteIds = await getFavoriteIds();
+      return favoriteIds.contains(fishId);
+    } catch (e) {
+      print('Error checking if fish is favorite: $e');
+      return false;
+    }
+  }
+
+  /// Add a fish to favorites
+  static Future<bool> addToFavorites(String fishId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final favoriteIds = await getFavoriteIds();
+      
+      if (!favoriteIds.contains(fishId)) {
+        favoriteIds.add(fishId);
+        final success = await prefs.setStringList(_favoritesKey, favoriteIds.toList());
+        
+        if (success) {
+          print('Added fish $fishId to favorites');
+          return true;
+        }
+      }
+      
+      return false;
+    } catch (e) {
+      print('Error adding fish to favorites: $e');
+      return false;
+    }
+  }
+
+  /// Remove a fish from favorites
+  static Future<bool> removeFromFavorites(String fishId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final favoriteIds = await getFavoriteIds();
+      
+      if (favoriteIds.contains(fishId)) {
+        favoriteIds.remove(fishId);
+        final success = await prefs.setStringList(_favoritesKey, favoriteIds.toList());
+        
+        if (success) {
+          print('Removed fish $fishId from favorites');
+          return true;
+        }
+      }
+      
+      return false;
+    } catch (e) {
+      print('Error removing fish from favorites: $e');
+      return false;
+    }
+  }
+
+  /// Toggle favorite status for a fish
+  static Future<bool> toggleFavorite(String fishId) async {
+    try {
+      final isCurrentlyFavorite = await isFavorite(fishId);
+      
+      if (isCurrentlyFavorite) {
+        return await removeFromFavorites(fishId);
+      } else {
+        return await addToFavorites(fishId);
+      }
+    } catch (e) {
+      print('Error toggling favorite: $e');
+      return false;
+    }
+  }
+
+  /// Get all favorite fish objects
+  static Future<List<Fish>> getFavoriteFish() async {
+    try {
+      final favoriteIds = await getFavoriteIds();
+      
+      if (favoriteIds.isEmpty) {
+        return [];
+      }
+
+      final List<Fish> favoriteFish = [];
+      
+      for (final fishId in favoriteIds) {
+        final fish = await FishService.getFishById(fishId);
+        if (fish != null) {
+          favoriteFish.add(fish);
+        }
+      }
+      
+      // Sort alphabetically by name
+      favoriteFish.sort((a, b) => a.uniqueName.compareTo(b.uniqueName));
+      
+      return favoriteFish;
+    } catch (e) {
+      print('Error getting favorite fish: $e');
+      return [];
+    }
+  }
+
+  /// Get count of favorite fish
+  static Future<int> getFavoriteCount() async {
+    try {
+      final favoriteIds = await getFavoriteIds();
+      return favoriteIds.length;
+    } catch (e) {
+      print('Error getting favorite count: $e');
+      return 0;
+    }
+  }
+
+  /// Clear all favorites
+  static Future<bool> clearAllFavorites() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final success = await prefs.remove(_favoritesKey);
+      
+      if (success) {
+        print('Cleared all favorites');
+      }
+      
+      return success;
+    } catch (e) {
+      print('Error clearing favorites: $e');
+      return false;
+    }
+  }
+
+  /// Export favorites as a list of fish IDs
+  static Future<List<String>> exportFavorites() async {
+    try {
+      final favoriteIds = await getFavoriteIds();
+      return favoriteIds.toList();
+    } catch (e) {
+      print('Error exporting favorites: $e');
+      return [];
+    }
+  }
+
+  /// Import favorites from a list of fish IDs
+  static Future<bool> importFavorites(List<String> fishIds) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      // Validate that all fish IDs exist
+      final validIds = <String>[];
+      for (final fishId in fishIds) {
+        final fish = await FishService.getFishById(fishId);
+        if (fish != null) {
+          validIds.add(fishId);
+        }
+      }
+      
+      final success = await prefs.setStringList(_favoritesKey, validIds);
+      
+      if (success) {
+        print('Imported ${validIds.length} favorites (${fishIds.length - validIds.length} invalid IDs skipped)');
+      }
+      
+      return success;
+    } catch (e) {
+      print('Error importing favorites: $e');
+      return false;
+    }
+  }
+
+  /// Add multiple fish to favorites at once
+  static Future<int> addMultipleToFavorites(List<String> fishIds) async {
+    try {
+      int addedCount = 0;
+      
+      for (final fishId in fishIds) {
+        final added = await addToFavorites(fishId);
+        if (added) {
+          addedCount++;
+        }
+      }
+      
+      return addedCount;
+    } catch (e) {
+      print('Error adding multiple to favorites: $e');
+      return 0;
+    }
+  }
+
+  /// Get recently added favorites (last N added)
+  static Future<List<Fish>> getRecentlyAddedFavorites({int limit = 5}) async {
+    try {
+      // Note: SharedPreferences doesn't maintain order,
+      // so this is a simplified implementation
+      // In a production app, you might want to store timestamps
+      final favoriteFish = await getFavoriteFish();
+      
+      // Return last N fish (or all if less than N)
+      if (favoriteFish.length <= limit) {
+        return favoriteFish;
+      }
+      
+      return favoriteFish.sublist(favoriteFish.length - limit);
+    } catch (e) {
+      print('Error getting recently added favorites: $e');
+      return [];
+    }
+  }
+}
