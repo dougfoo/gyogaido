@@ -1,5 +1,6 @@
 import '../database/database_helper.dart';
 import '../models/fish.dart';
+import '../utils/logger.dart';
 
 /// Service class for fish-related operations
 /// 
@@ -13,7 +14,7 @@ class FishService {
     try {
       return await _db.getAllFish();
     } catch (e) {
-      print('Error getting all fish: $e');
+      Logger.error('Error getting all fish: $e', 'FishService');
       return [];
     }
   }

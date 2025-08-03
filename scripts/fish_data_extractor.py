@@ -23,6 +23,9 @@ from dataclasses import dataclass, asdict
 from typing import List, Dict, Optional
 import hashlib
 from pathlib import Path
+import re
+from urllib.parse import urljoin, urlparse
+import base64
 
 @dataclass
 class FishData:
@@ -290,48 +293,161 @@ class FishDataExtractor:
         return []
 
     def download_free_images(self, fish_list: List[FishData]):
-        """Download images from free, open sources without API keys"""
-        print("Downloading images from free sources...")
+        """Download images from multiple free, open sources without API keys"""
+        print("Downloading images from multiple free sources...")
         
         for fish in fish_list:
             fish_id = fish.id
             common_name = fish.unique_name
             scientific_name = fish.scientific_name
+            japanese_romaji = fish.japanese_name_romaji
             
             print(f"Downloading images for: {common_name}")
             
-            # Download from different free sources
-            self.download_wikimedia_images(fish_id, common_name, scientific_name)
-            self.create_enhanced_placeholders(fish_id, common_name, scientific_name)
+            # Download different types of images from various sources
+            success_counts = {
+                'natural': 0,
+                'scientific': 0,
+                'maps': 0,
+                'sushi': 0
+            }
             
-            # Small delay to be respectful
-            time.sleep(1)
+            # Try multiple sources for each image type
+            success_counts['natural'] += self.download_natural_images(fish_id, common_name, scientific_name)
+            success_counts['scientific'] += self.download_scientific_diagrams(fish_id, common_name, scientific_name)
+            success_counts['maps'] += self.download_habitat_maps(fish_id, common_name, scientific_name)
+            success_counts['sushi'] += self.download_sushi_images(fish_id, common_name, japanese_romaji)
+            
+            # Create placeholders only for missing images
+            self.create_missing_placeholders(fish_id, common_name, scientific_name, success_counts)
+            
+            # Small delay to be respectful to all sources
+            time.sleep(2)
                         
         print(f"Downloaded images for {len(fish_list)} fish species")
 
-    def download_wikimedia_images(self, fish_id: str, common_name: str, scientific_name: str):
+    def download_natural_images(self, fish_id: str, common_name: str, scientific_name: str) -> int:
+        """Download natural/wild fish images from multiple sources"""
+        images_downloaded = 0
+        target_count = 2
+        
+        # Try different sources for natural fish photos
+        sources = [
+            lambda: self.download_wikimedia_images(fish_id, common_name, scientific_name, 'natural'),
+            lambda: self.download_fishbase_images(fish_id, common_name, scientific_name, 'natural'),
+            lambda: self.download_gbif_images(fish_id, scientific_name, 'natural'),
+            lambda: self.download_inaturalist_images(fish_id, scientific_name, 'natural')
+        ]
+        
+        for source_func in sources:
+            if images_downloaded >= target_count:
+                break
+            try:
+                images_downloaded += source_func()
+                time.sleep(1)  # Rate limiting
+            except Exception as e:
+                print(f"  [WARNING] Source failed: {e}")
+                continue
+        
+        print(f"  [INFO] Downloaded {images_downloaded}/{target_count} natural images")
+        return images_downloaded
+
+    def download_scientific_diagrams(self, fish_id: str, common_name: str, scientific_name: str) -> int:
+        """Download scientific diagrams and anatomy illustrations"""
+        images_downloaded = 0
+        target_count = 1
+        
+        # Try different sources for scientific diagrams
+        sources = [
+            lambda: self.download_fishbase_diagrams(fish_id, scientific_name),
+            lambda: self.download_wikimedia_images(fish_id, f"{scientific_name} anatomy", scientific_name, 'scientific'),
+            lambda: self.download_wikimedia_images(fish_id, f"{common_name} diagram", scientific_name, 'scientific'),
+            lambda: self.download_fao_diagrams(fish_id, scientific_name)
+        ]
+        
+        for source_func in sources:
+            if images_downloaded >= target_count:
+                break
+            try:
+                images_downloaded += source_func()
+                time.sleep(1)
+            except Exception as e:
+                print(f"  [WARNING] Scientific diagram source failed: {e}")
+                continue
+        
+        print(f"  [INFO] Downloaded {images_downloaded}/{target_count} scientific diagrams")
+        return images_downloaded
+
+    def download_habitat_maps(self, fish_id: str, common_name: str, scientific_name: str) -> int:
+        """Download habitat distribution maps"""
+        images_downloaded = 0
+        target_count = 1
+        
+        # Try different sources for habitat maps
+        sources = [
+            lambda: self.download_fishbase_maps(fish_id, scientific_name),
+            lambda: self.download_gbif_maps(fish_id, scientific_name),
+            lambda: self.download_aquamaps_data(fish_id, scientific_name),
+            lambda: self.download_wikimedia_images(fish_id, f"{scientific_name} distribution", scientific_name, 'maps')
+        ]
+        
+        for source_func in sources:
+            if images_downloaded >= target_count:
+                break
+            try:
+                images_downloaded += source_func()
+                time.sleep(1)
+            except Exception as e:
+                print(f"  [WARNING] Habitat map source failed: {e}")
+                continue
+        
+        print(f"  [INFO] Downloaded {images_downloaded}/{target_count} habitat maps")
+        return images_downloaded
+
+    def download_sushi_images(self, fish_id: str, common_name: str, japanese_romaji: str) -> int:
+        """Download sushi preparation images (nigiri and sashimi)"""
+        images_downloaded = 0
+        target_count = 2  # nigiri + sashimi
+        
+        # Try different sources for sushi images
+        sources = [
+            lambda: self.download_wikimedia_sushi_images(fish_id, common_name, japanese_romaji),
+            lambda: self.download_unsplash_sushi_images(fish_id, common_name, japanese_romaji),
+            lambda: self.download_pexels_sushi_images(fish_id, common_name, japanese_romaji)
+        ]
+        
+        for source_func in sources:
+            if images_downloaded >= target_count:
+                break
+            try:
+                images_downloaded += source_func()
+                time.sleep(1)
+            except Exception as e:
+                print(f"  [WARNING] Sushi image source failed: {e}")
+                continue
+        
+        print(f"  [INFO] Downloaded {images_downloaded}/{target_count} sushi images")
+        return images_downloaded
+
+    def download_wikimedia_images(self, fish_id: str, search_term: str, scientific_name: str, image_type: str = 'natural') -> int:
         """Download images from Wikimedia Commons (free license)"""
         try:
-            # Wikimedia Commons API - no key needed, free license
             wiki_api = "https://commons.wikimedia.org/w/api.php"
-            
-            search_terms = [
-                f"{scientific_name}",
-                f"{common_name} fish",
-                f"{scientific_name} fish"
-            ]
-            
             images_downloaded = 0
+            target_count = 2 if image_type == 'natural' else 1
             
-            for search_term in search_terms:
-                if images_downloaded >= 2:  # Limit to 2 images per fish
+            # Enhanced search terms based on image type
+            search_queries = self.get_wikimedia_search_terms(search_term, scientific_name, image_type)
+            
+            for query in search_queries:
+                if images_downloaded >= target_count:
                     break
                     
                 params = {
                     'action': 'query',
                     'format': 'json',
                     'list': 'search',
-                    'srsearch': f'filetype:bitmap {search_term}',
+                    'srsearch': f'filetype:bitmap {query}',
                     'srnamespace': 6,  # File namespace
                     'srlimit': 5
                 }
@@ -343,15 +459,16 @@ class FishDataExtractor:
                         
                         if 'query' in data and 'search' in data['query']:
                             for result in data['query']['search']:
-                                if images_downloaded >= 2:
+                                if images_downloaded >= target_count:
                                     break
                                     
                                 file_title = result['title']
                                 image_url = self.get_wikimedia_image_url(file_title)
                                 
                                 if image_url:
-                                    filename = f"{fish_id}_natural_{images_downloaded + 1}.jpg"
-                                    filepath = self.images_dir / "natural" / filename
+                                    filename = self.get_filename(fish_id, image_type, images_downloaded)
+                                    folder = self.get_image_folder(image_type)
+                                    filepath = self.images_dir / folder / filename
                                     
                                     if self.download_image_from_url(image_url, filepath):
                                         print(f"  [OK] Downloaded {filename} from Wikimedia")
@@ -359,11 +476,14 @@ class FishDataExtractor:
                                         time.sleep(2)  # Be respectful to Wikimedia
                                 
                 except Exception as e:
-                    print(f"  [ERROR] Wikimedia search error: {e}")
+                    print(f"  [WARNING] Wikimedia search error: {e}")
                     continue
+            
+            return images_downloaded
                     
         except Exception as e:
-            print(f"  [ERROR] Error downloading Wikimedia images for {common_name}: {e}")
+            print(f"  [ERROR] Error downloading Wikimedia images: {e}")
+            return 0
 
     def get_wikimedia_image_url(self, file_title: str) -> Optional[str]:
         """Get direct image URL from Wikimedia Commons file title"""
@@ -415,6 +535,402 @@ class FishDataExtractor:
         except Exception as e:
             print(f"  [ERROR] Download error: {e}")
             return False
+
+    # Helper functions for image management
+    def get_wikimedia_search_terms(self, search_term: str, scientific_name: str, image_type: str) -> List[str]:
+        """Generate appropriate search terms for different image types"""
+        base_terms = [search_term, scientific_name]
+        
+        if image_type == 'natural':
+            return [f"{term}" for term in base_terms] + [f"{term} fish" for term in base_terms]
+        elif image_type == 'scientific':
+            return [f"{search_term} anatomy", f"{search_term} diagram", f"{search_term} illustration",
+                    f"{scientific_name} anatomy", f"{scientific_name} diagram", f"{scientific_name} illustration"]
+        elif image_type == 'maps':
+            return [f"{search_term} distribution", f"{search_term} habitat", f"{search_term} range map",
+                    f"{scientific_name} distribution", f"{scientific_name} habitat", f"{scientific_name} range map"]
+        elif image_type == 'sushi':
+            return [f"{search_term} sushi", f"{search_term} sashimi", f"{search_term} nigiri",
+                    f"{scientific_name} sushi", f"{scientific_name} sashimi", f"{scientific_name} nigiri"]
+        
+        return base_terms
+
+    def get_filename(self, fish_id: str, image_type: str, index: int) -> str:
+        """Generate appropriate filename based on image type and index"""
+        if image_type == 'natural':
+            return f"{fish_id}_natural_{index + 1}.jpg"
+        elif image_type == 'scientific':
+            return f"{fish_id}_diagram.jpg"
+        elif image_type == 'maps':
+            return f"{fish_id}_habitat.jpg"
+        elif image_type == 'sushi':
+            suffix = 'nigiri' if index == 0 else 'sashimi'
+            return f"{fish_id}_{suffix}.jpg"
+        return f"{fish_id}_{image_type}_{index + 1}.jpg"
+
+    def get_image_folder(self, image_type: str) -> str:
+        """Get the folder name for different image types"""
+        folder_map = {
+            'natural': 'natural',
+            'scientific': 'scientific',
+            'maps': 'maps',
+            'sushi': 'sushi'
+        }
+        return folder_map.get(image_type, 'natural')
+
+    # Additional source functions
+    def download_fishbase_images(self, fish_id: str, common_name: str, scientific_name: str, image_type: str) -> int:
+        """Download images from FishBase"""
+        try:
+            # FishBase image search
+            search_url = f"https://www.fishbase.se/photos/PicturesSummary.php?resultPage=1&what=species&ID={scientific_name}"
+            
+            response = self.session.get(search_url, timeout=10)
+            if response.status_code == 200:
+                # Parse HTML to find image URLs (simplified - would need proper HTML parsing)
+                content = response.text
+                image_urls = re.findall(r'https://www\.fishbase\.se/photos/.*?\.jpg', content)
+                
+                images_downloaded = 0
+                target = 2 if image_type == 'natural' else 1
+                
+                for url in image_urls[:target]:
+                    filename = self.get_filename(fish_id, image_type, images_downloaded)
+                    folder = self.get_image_folder(image_type)
+                    filepath = self.images_dir / folder / filename
+                    
+                    if self.download_image_from_url(url, filepath):
+                        print(f"  [OK] Downloaded {filename} from FishBase")
+                        images_downloaded += 1
+                        time.sleep(1)
+                
+                return images_downloaded
+            return 0
+        except Exception as e:
+            print(f"  [WARNING] FishBase download failed: {e}")
+            return 0
+
+    def download_gbif_images(self, fish_id: str, scientific_name: str, image_type: str) -> int:
+        """Download images from GBIF (Global Biodiversity Information Facility)"""
+        try:
+            # GBIF API for species images
+            gbif_api = "https://api.gbif.org/v1/species/search"
+            params = {'q': scientific_name, 'limit': 1}
+            
+            response = self.session.get(gbif_api, params=params, timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('results'):
+                    species_key = data['results'][0].get('key')
+                    
+                    # Get occurrence images
+                    occurrence_api = f"https://api.gbif.org/v1/occurrence/search"
+                    params = {'taxonKey': species_key, 'mediaType': 'StillImage', 'limit': 5}
+                    
+                    response = self.session.get(occurrence_api, params=params, timeout=10)
+                    if response.status_code == 200:
+                        data = response.json()
+                        images_downloaded = 0
+                        target = 2 if image_type == 'natural' else 1
+                        
+                        for occurrence in data.get('results', [])[:target]:
+                            media = occurrence.get('media', [])
+                            for media_item in media:
+                                if media_item.get('type') == 'StillImage':
+                                    url = media_item.get('identifier')
+                                    if url:
+                                        filename = self.get_filename(fish_id, image_type, images_downloaded)
+                                        folder = self.get_image_folder(image_type)
+                                        filepath = self.images_dir / folder / filename
+                                        
+                                        if self.download_image_from_url(url, filepath):
+                                            print(f"  [OK] Downloaded {filename} from GBIF")
+                                            images_downloaded += 1
+                                            time.sleep(1)
+                                        break
+                        
+                        return images_downloaded
+            return 0
+        except Exception as e:
+            print(f"  [WARNING] GBIF download failed: {e}")
+            return 0
+
+    def download_inaturalist_images(self, fish_id: str, scientific_name: str, image_type: str) -> int:
+        """Download images from iNaturalist"""
+        try:
+            # iNaturalist API
+            api_url = "https://api.inaturalist.org/v1/observations"
+            params = {
+                'taxon_name': scientific_name,
+                'photos': 'true',
+                'quality_grade': 'research',
+                'per_page': 5
+            }
+            
+            response = self.session.get(api_url, params=params, timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                images_downloaded = 0
+                target = 2 if image_type == 'natural' else 1
+                
+                for observation in data.get('results', [])[:target]:
+                    photos = observation.get('photos', [])
+                    for photo in photos:
+                        url = photo.get('url')
+                        if url:
+                            # Get medium size image
+                            url = url.replace('square', 'medium')
+                            filename = self.get_filename(fish_id, image_type, images_downloaded)
+                            folder = self.get_image_folder(image_type)
+                            filepath = self.images_dir / folder / filename
+                            
+                            if self.download_image_from_url(url, filepath):
+                                print(f"  [OK] Downloaded {filename} from iNaturalist")
+                                images_downloaded += 1
+                                time.sleep(1)
+                            break
+                
+                return images_downloaded
+            return 0
+        except Exception as e:
+            print(f"  [WARNING] iNaturalist download failed: {e}")
+            return 0
+
+    def download_fishbase_diagrams(self, fish_id: str, scientific_name: str) -> int:
+        """Download scientific diagrams from FishBase"""
+        try:
+            # FishBase species page for diagrams
+            species_url = f"https://www.fishbase.se/summary/{scientific_name.replace(' ', '-')}.html"
+            
+            response = self.session.get(species_url, timeout=10)
+            if response.status_code == 200:
+                content = response.text
+                # Look for diagram images (simplified pattern)
+                diagram_urls = re.findall(r'https://www\.fishbase\.se/images/species/.*?\.gif', content)
+                
+                for url in diagram_urls[:1]:  # Just one diagram
+                    filename = f"{fish_id}_diagram.jpg"
+                    filepath = self.images_dir / "scientific" / filename
+                    
+                    if self.download_image_from_url(url, filepath):
+                        print(f"  [OK] Downloaded {filename} from FishBase")
+                        return 1
+                        
+            return 0
+        except Exception as e:
+            print(f"  [WARNING] FishBase diagram download failed: {e}")
+            return 0
+
+    def download_fao_diagrams(self, fish_id: str, scientific_name: str) -> int:
+        """Download scientific diagrams from FAO Species Identification Sheets"""
+        try:
+            # FAO species database (simplified)
+            fao_url = f"http://www.fao.org/fishery/species/search"
+            params = {'species': scientific_name}
+            
+            response = self.session.get(fao_url, params=params, timeout=10)
+            if response.status_code == 200:
+                # This would need more sophisticated parsing
+                # For now, return 0 as this requires complex HTML parsing
+                return 0
+            return 0
+        except Exception as e:
+            print(f"  [WARNING] FAO diagram download failed: {e}")
+            return 0
+
+    def download_fishbase_maps(self, fish_id: str, scientific_name: str) -> int:
+        """Download habitat maps from FishBase"""
+        try:
+            # FishBase distribution map
+            map_url = f"https://www.fishbase.se/Country/CountrySpeciesSummary.php?c_code=&id={scientific_name}"
+            
+            response = self.session.get(map_url, timeout=10)
+            if response.status_code == 200:
+                content = response.text
+                # Look for map images
+                map_urls = re.findall(r'https://www\.fishbase\.se/images/gifs/.*?map.*?\.gif', content)
+                
+                for url in map_urls[:1]:  # Just one map
+                    filename = f"{fish_id}_habitat.jpg"
+                    filepath = self.images_dir / "maps" / filename
+                    
+                    if self.download_image_from_url(url, filepath):
+                        print(f"  [OK] Downloaded {filename} from FishBase")
+                        return 1
+                        
+            return 0
+        except Exception as e:
+            print(f"  [WARNING] FishBase map download failed: {e}")
+            return 0
+
+    def download_gbif_maps(self, fish_id: str, scientific_name: str) -> int:
+        """Download distribution maps from GBIF"""
+        try:
+            # GBIF map API
+            gbif_api = "https://api.gbif.org/v1/species/search"
+            params = {'q': scientific_name, 'limit': 1}
+            
+            response = self.session.get(gbif_api, params=params, timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('results'):
+                    species_key = data['results'][0].get('key')
+                    
+                    # GBIF map URL
+                    map_url = f"https://api.gbif.org/v2/map/occurrence/density/0/0/0@1x.png?taxonKey={species_key}"
+                    
+                    filename = f"{fish_id}_habitat.jpg"
+                    filepath = self.images_dir / "maps" / filename
+                    
+                    if self.download_image_from_url(map_url, filepath):
+                        print(f"  [OK] Downloaded {filename} from GBIF")
+                        return 1
+                        
+            return 0
+        except Exception as e:
+            print(f"  [WARNING] GBIF map download failed: {e}")
+            return 0
+
+    def download_aquamaps_data(self, fish_id: str, scientific_name: str) -> int:
+        """Download habitat data from AquaMaps"""
+        try:
+            # AquaMaps API (simplified)
+            # This would require more complex API integration
+            return 0
+        except Exception as e:
+            print(f"  [WARNING] AquaMaps download failed: {e}")
+            return 0
+
+    def download_wikimedia_sushi_images(self, fish_id: str, common_name: str, japanese_romaji: str) -> int:
+        """Download sushi images from Wikimedia"""
+        images_downloaded = 0
+        
+        # Search for both nigiri and sashimi
+        sushi_types = ['nigiri', 'sashimi']
+        search_terms = [common_name, japanese_romaji]
+        
+        for sushi_type in sushi_types:
+            for term in search_terms:
+                if images_downloaded >= 2:
+                    break
+                    
+                result = self.download_wikimedia_images(
+                    fish_id, f"{term} {sushi_type}", common_name, 'sushi'
+                )
+                images_downloaded += result
+                
+                if result > 0:
+                    break  # Found image for this sushi type
+        
+        return min(images_downloaded, 2)
+
+    def download_unsplash_sushi_images(self, fish_id: str, common_name: str, japanese_romaji: str) -> int:
+        """Download sushi images from Unsplash (would need API key)"""
+        # Unsplash requires API key, returning 0 for now
+        # Could be implemented with proper API key
+        return 0
+
+    def download_pexels_sushi_images(self, fish_id: str, common_name: str, japanese_romaji: str) -> int:
+        """Download sushi images from Pexels (would need API key)"""
+        # Pexels requires API key, returning 0 for now
+        # Could be implemented with proper API key
+        return 0
+
+    def create_missing_placeholders(self, fish_id: str, common_name: str, scientific_name: str, success_counts: Dict[str, int]):
+        """Create placeholders only for images that couldn't be downloaded"""
+        targets = {'natural': 2, 'scientific': 1, 'maps': 1, 'sushi': 2}
+        
+        for image_type, target_count in targets.items():
+            downloaded = success_counts.get(image_type, 0)
+            missing = target_count - downloaded
+            
+            if missing > 0:
+                print(f"  [INFO] Creating {missing} placeholder(s) for {image_type} images")
+                self.create_type_specific_placeholders(fish_id, common_name, scientific_name, image_type, downloaded, missing)
+
+    def create_type_specific_placeholders(self, fish_id: str, common_name: str, scientific_name: str, image_type: str, start_index: int, count: int):
+        """Create placeholders for specific image type"""
+        try:
+            from PIL import Image, ImageDraw, ImageFont
+            
+            color_map = {
+                'natural': (70, 130, 180),
+                'scientific': (147, 112, 219),
+                'maps': (32, 178, 170),
+                'sushi': (255, 160, 122)
+            }
+            
+            text_map = {
+                'natural': f"{common_name}\n(Natural Photo)",
+                'scientific': f"{scientific_name}\n(Diagram)",
+                'maps': f"{common_name}\n(Habitat Map)",
+                'sushi': f"{common_name}\n(Sushi)"
+            }
+            
+            color = color_map.get(image_type, (128, 128, 128))
+            text = text_map.get(image_type, common_name)
+            
+            for i in range(count):
+                filename = self.get_filename(fish_id, image_type, start_index + i)
+                folder = self.get_image_folder(image_type)
+                filepath = self.images_dir / folder / filename
+                
+                # Create enhanced placeholder
+                img = Image.new('RGB', (600, 400), color)
+                draw = ImageDraw.Draw(img)
+                
+                try:
+                    font = ImageFont.truetype("arial.ttf", 32)
+                except:
+                    font = ImageFont.load_default()
+                
+                # Calculate text position
+                bbox = draw.textbbox((0, 0), text, font=font)
+                text_width = bbox[2] - bbox[0]
+                text_height = bbox[3] - bbox[1]
+                x = (600 - text_width) // 2
+                y = (400 - text_height) // 2
+                
+                # Draw text with shadow
+                draw.text((x+2, y+2), text, fill=(0, 0, 0, 128), font=font)
+                draw.text((x, y), text, fill=(255, 255, 255), font=font)
+                
+                img.save(filepath, "JPEG", quality=90)
+                print(f"  [OK] Created placeholder {filename}")
+                
+        except ImportError:
+            # Fallback to basic placeholders
+            self.create_basic_type_placeholders(fish_id, image_type, start_index, count)
+        except Exception as e:
+            print(f"  [ERROR] Error creating placeholders: {e}")
+
+    def create_basic_type_placeholders(self, fish_id: str, image_type: str, start_index: int, count: int):
+        """Create basic placeholder images when PIL is not available"""
+        minimal_jpeg = bytes([
+            0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01,
+            0x01, 0x01, 0x00, 0x48, 0x00, 0x48, 0x00, 0x00, 0xFF, 0xDB, 0x00, 0x43,
+            0x00, 0x08, 0x06, 0x06, 0x07, 0x06, 0x05, 0x08, 0x07, 0x07, 0x07, 0x09,
+            0x09, 0x08, 0x0A, 0x0C, 0x14, 0x0D, 0x0C, 0x0B, 0x0B, 0x0C, 0x19, 0x12,
+            0x13, 0x0F, 0x14, 0x1D, 0x1A, 0x1F, 0x1E, 0x1D, 0x1A, 0x1C, 0x1C, 0x20,
+            0x24, 0x2E, 0x27, 0x20, 0x22, 0x2C, 0x23, 0x1C, 0x1C, 0x28, 0x37, 0x29,
+            0x2C, 0x30, 0x31, 0x34, 0x34, 0x34, 0x1F, 0x27, 0x39, 0x3D, 0x38, 0x32,
+            0x3C, 0x2E, 0x33, 0x34, 0x32, 0xFF, 0xC0, 0x00, 0x11, 0x08, 0x00, 0x64,
+            0x00, 0x64, 0x03, 0x01, 0x22, 0x00, 0x02, 0x11, 0x01, 0x03, 0x11, 0x01,
+            0xFF, 0xC4, 0x00, 0x14, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0xFF, 0xC4,
+            0x00, 0x14, 0x10, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xDA, 0x00, 0x0C,
+            0x03, 0x01, 0x00, 0x02, 0x11, 0x03, 0x11, 0x00, 0x3F, 0x00, 0x9F, 0xFF, 0xD9
+        ])
+        
+        for i in range(count):
+            filename = self.get_filename(fish_id, image_type, start_index + i)
+            folder = self.get_image_folder(image_type)
+            filepath = self.images_dir / folder / filename
+            
+            with open(filepath, 'wb') as f:
+                f.write(minimal_jpeg)
+            print(f"  [OK] Created basic {filename}")
 
     def create_enhanced_placeholders(self, fish_id: str, common_name: str, scientific_name: str):
         """Create enhanced placeholder images with fish information"""

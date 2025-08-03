@@ -38,7 +38,6 @@ class FishCard extends StatelessWidget {
         imageHeightFactor = 2 / 3;
         break;
       case ImageSize.large:
-      default:
         imageHeightFactor = 1;
         break;
     }
@@ -60,12 +59,12 @@ class FishCard extends StatelessWidget {
       child: Tooltip(
         message: 'Click for details',
         child: Card(
-          child: Container(
+          child: SizedBox(
             height: height,
             child: Row(
               children: <Widget>[
                 if (imageSize != ImageSize.noshow)
-                  Container(
+                  SizedBox(
                     width: imageWidth,
                     height: height * imageHeightFactor,
                     child: ClipRRect(

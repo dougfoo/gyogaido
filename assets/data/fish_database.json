@@ -6,8 +6,8 @@
       "description": "Bluefin tuna  is a common name used to refer to several species of tuna of the genus Thunnus.",
       "common_aliases": [
         "Kuro-maguro",
-        "Maguro",
-        "Hon-maguro"
+        "Hon-maguro",
+        "Maguro"
       ],
       "scientific_name": "Thunnus thynnus",
       "japanese_name_romaji": "Kuro-maguro",
@@ -40,8 +40,8 @@
       "unique_name": "Yellowfin Tuna",
       "description": "The yellowfin tuna is a species of tuna found in pelagic waters of tropical and subtropical oceans worldwide.",
       "common_aliases": [
-        "Ahi",
-        "Kihada"
+        "Kihada",
+        "Ahi"
       ],
       "scientific_name": "Thunnus albacares",
       "japanese_name_romaji": "Kihada",
@@ -109,8 +109,8 @@
       "description": "Premium fish with buttery texture and clean taste. Young yellowtail (hamachi) is especially prized for sushi and sashimi.",
       "common_aliases": [
         "Hamachi",
-        "Yellowtail",
-        "Buri"
+        "Buri",
+        "Yellowtail"
       ],
       "scientific_name": "Seriola quinqueradiata",
       "japanese_name_romaji": "Hamachi",
@@ -143,9 +143,9 @@
       "unique_name": "Red Sea Bream",
       "description": "A species of fish commonly used in Japanese cuisine, particularly sushi and sashimi preparation.",
       "common_aliases": [
-        "Madai",
         "Tai",
-        "Sea Bream"
+        "Sea Bream",
+        "Madai"
       ],
       "scientific_name": "Pagrus major",
       "japanese_name_romaji": "Madai",
@@ -671,7 +671,7 @@
   ],
   "metadata": {
     "version": "1.0",
-    "generated_at": "2025-08-03 07:51:41",
+    "generated_at": "2025-08-03 10:12:35",
     "total_species": 20,
     "description": "Fish database for Gyo Gai Do app"
   }

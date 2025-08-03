@@ -59,7 +59,10 @@ class _AppInitializerState extends State<AppInitializer> {
   @override
   void initState() {
     super.initState();
-    _initializeProviders();
+    // Delay initialization to next frame to avoid setState during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeProviders();
+    });
   }
 
   Future<void> _initializeProviders() async {
@@ -246,8 +249,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    const FaIcon(FontAwesomeIcons.heart),
-                    const Text(
+                    FaIcon(FontAwesomeIcons.heart),
+                    Text(
                       'Add to favorites',
                       style: TextStyle(fontSize: 20),
                     ),
@@ -256,8 +259,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    const FaIcon(FontAwesomeIcons.book),
-                    const Text(
+                    FaIcon(FontAwesomeIcons.book),
+                    Text(
                       'Learn more in the fish library',
                       style: TextStyle(fontSize: 20),
                     ),
@@ -287,7 +290,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onTap: _onItemTapped,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: FaIcon(FontAwesomeIcons.home),
+            icon: FaIcon(FontAwesomeIcons.house),
             label: 'Home',
           ),
           BottomNavigationBarItem(

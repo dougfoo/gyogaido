@@ -3,7 +3,14 @@
     "allow": [
       "Bash(python:*)",
       "Bash(flutter pub:*)",
-      "Bash(flutter analyze:*)"
+      "Bash(flutter analyze:*)",
+      "Bash(flutter:*)",
+      "Bash(ls:*)",
+      "Bash(start_fish_server.bat)",
+      "Bash(echo $ANDROID_SDK_ROOT)",
+      "Bash(start /B python:*)",
+      "Bash(\"$ANDROID_SDK_ROOT/platform-tools/adb.exe\":*)",
+      "Bash(cmd /c:*)"
     ],
     "deny": []
   }
