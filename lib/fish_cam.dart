@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'utils/logger.dart';
+import 'widgets/web_camera_widget.dart';
 // import 'package:googleapis/vision/v1.dart' as vision;
 // import 'package:googleapis_auth/auth_io.dart';
 // import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -62,6 +63,43 @@ class _FishScannerState extends State<FishScanner> {
         _result = 'No image selected.';
       }
     });
+  }
+
+  /// Open web camera interface for live camera access
+  Future<void> _openWebCamera() async {
+    if (!kIsWeb) {
+      Logger.warning('Web camera called on non-web platform', 'FishScanner');
+      return;
+    }
+
+    try {
+      final XFile? capturedImage = await Navigator.push<XFile?>(
+        context,
+        MaterialPageRoute(
+          builder: (context) => WebCameraWidget(
+            onImageCaptured: (XFile image) {
+              Navigator.pop(context, image);
+            },
+            onCancel: () {
+              Navigator.pop(context);
+            },
+          ),
+        ),
+      );
+
+      if (capturedImage != null) {
+        setState(() {
+          _image = capturedImage;
+          _result = 'Photo captured successfully from camera!';
+        });
+        Logger.info('Photo captured from web camera', 'FishScanner');
+      }
+    } catch (e) {
+      Logger.error('Error opening web camera: $e', 'FishScanner', e);
+      setState(() {
+        _result = 'Error accessing camera: ${e.toString()}';
+      });
+    }
   }
 
   Future<void> _identifyImage(XFile image) async {
@@ -155,9 +193,13 @@ class _FishScannerState extends State<FishScanner> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton.icon(
-                    onPressed: _isLoading ? null : () => _getImage(ImageSource.camera),
+                    onPressed: _isLoading 
+                        ? null 
+                        : kIsWeb 
+                            ? _openWebCamera 
+                            : () => _getImage(ImageSource.camera),
                     icon: const Icon(Icons.camera_alt),
-                    label: const Text('Camera'),
+                    label: Text(kIsWeb ? 'Live Camera' : 'Camera'),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     ),
@@ -225,7 +267,7 @@ class _FishScannerState extends State<FishScanner> {
                       Icon(Icons.info, color: Colors.blue),
                       SizedBox(height: 8),
                       Text(
-                        'Web Mode: Camera access requires browser permissions.\nClick "Camera" to activate your laptop camera.',
+                        'Web Mode: Click "Live Camera" for real camera access.\nYour browser will request camera permissions.',
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 12, color: Colors.blue),
                       ),

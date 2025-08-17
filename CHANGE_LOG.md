@@ -4,6 +4,32 @@ All notable changes to the Gyo Gai Do fish identification Flutter app are docume
 
 ## [Unreleased] - 2025-01-08
 
+### 🎥 Camera System Enhancement (Latest Update)
+
+#### Web Camera Access Implementation
+- **Fixed Chrome web debug camera issue**: Camera button now activates laptop camera instead of file picker
+- **Added dedicated camera package**: Implemented `camera: ^0.10.5+9` for web platform support
+- **Created WebCameraWidget**: Full-featured live camera interface for web browsers
+- **Platform-conditional implementation**: Different camera strategies for web vs mobile
+- **Live camera preview**: Real-time camera stream with professional UI
+- **Enhanced user experience**: Full-screen camera interface with capture controls
+
+#### Technical Implementation
+- **New Components**:
+  - `lib/widgets/web_camera_widget.dart` - Web-specific camera interface
+  - Updated `lib/fish_cam.dart` - Platform detection and conditional camera access
+  - Enhanced `pubspec.yaml` - Added camera package dependency
+- **Smart Detection**: Automatically uses appropriate camera method based on platform
+- **Error Handling**: Comprehensive camera permission and access error management
+- **UI Improvements**: Different button labels ("Live Camera" for web, "Camera" for mobile)
+
+#### Camera Features
+- **Live Preview**: Real-time camera stream before capture
+- **Camera Switching**: Toggle between front/back cameras (if available)
+- **Permission Handling**: Proper browser camera permission requests
+- **Professional Interface**: Full-screen camera view with overlay instructions
+- **Capture Controls**: Large floating action button for photo taking
+
 ### 🎯 Major Improvements
 
 #### Image System Overhaul
