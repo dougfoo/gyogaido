@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import '../database/database_helper.dart';
 import '../models/fish.dart';
 import '../utils/logger.dart';
@@ -6,15 +9,48 @@ import '../utils/logger.dart';
 /// 
 /// This class provides a clean interface for fish data operations,
 /// abstracting away the database implementation details.
+/// Supports both SQLite (mobile/desktop) and JSON (web) data sources.
 class FishService {
   static final DatabaseHelper _db = DatabaseHelper.instance;
+  static List<Fish>? _webFishCache;
+  static bool _isWebDataLoaded = false;
 
-  /// Get all fish from the database
+  /// Load fish data from JSON assets (web platform)
+  static Future<void> _loadWebFishData() async {
+    if (_isWebDataLoaded && _webFishCache != null) {
+      return;
+    }
+
+    try {
+      Logger.info('Loading fish data from JSON for web platform...', 'FishService');
+      
+      final String jsonString = await rootBundle.loadString('assets/data/fish_database.json');
+      final Map<String, dynamic> jsonData = json.decode(jsonString);
+      final List<dynamic> fishList = jsonData['fish_database'] as List<dynamic>;
+      
+      _webFishCache = fishList.map((fishJson) => Fish.fromMap(fishJson as Map<String, dynamic>)).toList();
+      _isWebDataLoaded = true;
+      
+      Logger.info('Loaded ${_webFishCache!.length} fish species from JSON', 'FishService');
+    } catch (e) {
+      Logger.error('Error loading web fish data: $e', 'FishService', e);
+      _webFishCache = [];
+      _isWebDataLoaded = false;
+      rethrow;
+    }
+  }
+
+  /// Get all fish from the appropriate data source
   static Future<List<Fish>> getAllFish() async {
     try {
-      return await _db.getAllFish();
+      if (kIsWeb) {
+        await _loadWebFishData();
+        return List.from(_webFishCache ?? []);
+      } else {
+        return await _db.getAllFish();
+      }
     } catch (e) {
-      Logger.error('Error getting all fish: $e', 'FishService');
+      Logger.error('Error getting all fish: $e', 'FishService', e);
       return [];
     }
   }
@@ -22,9 +58,18 @@ class FishService {
   /// Get a specific fish by ID
   static Future<Fish?> getFishById(String id) async {
     try {
-      return await _db.getFishById(id);
+      if (kIsWeb) {
+        await _loadWebFishData();
+        try {
+          return _webFishCache?.firstWhere((fish) => fish.id == id);
+        } catch (e) {
+          return null;
+        }
+      } else {
+        return await _db.getFishById(id);
+      }
     } catch (e) {
-      print('Error getting fish by ID: $e');
+      Logger.error('Error getting fish by ID: $e', 'FishService', e);
       return null;
     }
   }
@@ -35,9 +80,23 @@ class FishService {
       if (query.trim().isEmpty) {
         return await getAllFish();
       }
-      return await _db.searchFish(query);
+      
+      if (kIsWeb) {
+        await _loadWebFishData();
+        final searchQuery = query.toLowerCase();
+        return _webFishCache?.where((fish) {
+          return fish.uniqueName.toLowerCase().contains(searchQuery) ||
+                 fish.scientificName.toLowerCase().contains(searchQuery) ||
+                 fish.description.toLowerCase().contains(searchQuery) ||
+                 fish.japaneseNameRomaji.toLowerCase().contains(searchQuery) ||
+                 fish.japaneseNameKanji.contains(query) ||
+                 fish.commonAliases.any((alias) => alias.toLowerCase().contains(searchQuery));
+        }).toList() ?? [];
+      } else {
+        return await _db.searchFish(query);
+      }
     } catch (e) {
-      print('Error searching fish: $e');
+      Logger.error('Error searching fish: $e', 'FishService', e);
       return [];
     }
   }
@@ -45,9 +104,17 @@ class FishService {
   /// Get fish by habitat
   static Future<List<Fish>> getFishByHabitat(String habitat) async {
     try {
-      return await _db.getFishByHabitat(habitat);
+      if (kIsWeb) {
+        await _loadWebFishData();
+        final habitatQuery = habitat.toLowerCase();
+        return _webFishCache?.where((fish) {
+          return fish.habitats.any((h) => h.toLowerCase().contains(habitatQuery));
+        }).toList() ?? [];
+      } else {
+        return await _db.getFishByHabitat(habitat);
+      }
     } catch (e) {
-      print('Error getting fish by habitat: $e');
+      Logger.error('Error getting fish by habitat: $e', 'FishService', e);
       return [];
     }
   }
@@ -55,9 +122,17 @@ class FishService {
   /// Get fish by preparation method
   static Future<List<Fish>> getFishByPreparation(String preparation) async {
     try {
-      return await _db.getFishByPreparation(preparation);
+      if (kIsWeb) {
+        await _loadWebFishData();
+        final prepQuery = preparation.toLowerCase();
+        return _webFishCache?.where((fish) {
+          return fish.waysToEat.any((way) => way.toLowerCase().contains(prepQuery));
+        }).toList() ?? [];
+      } else {
+        return await _db.getFishByPreparation(preparation);
+      }
     } catch (e) {
-      print('Error getting fish by preparation: $e');
+      Logger.error('Error getting fish by preparation: $e', 'FishService', e);
       return [];
     }
   }
@@ -74,7 +149,7 @@ class FishService {
         )
       ).toList();
     } catch (e) {
-      print('Error getting sushi fish: $e');
+      Logger.error('Error getting sushi fish: $e', 'FishService', e);
       return [];
     }
   }
@@ -85,7 +160,7 @@ class FishService {
       final allFish = await getAllFish();
       return allFish.take(10).toList();
     } catch (e) {
-      print('Error getting popular fish: $e');
+      Logger.error('Error getting popular fish: $e', 'FishService', e);
       return [];
     }
   }
@@ -99,7 +174,7 @@ class FishService {
         fish.japaneseNameKanji.contains(japaneseName)
       ).toList();
     } catch (e) {
-      print('Error getting fish by Japanese name: $e');
+      Logger.error('Error getting fish by Japanese name: $e', 'FishService', e);
       return [];
     }
   }
@@ -118,7 +193,7 @@ class FishService {
       sortedHabitats.sort();
       return sortedHabitats;
     } catch (e) {
-      print('Error getting all habitats: $e');
+      Logger.error('Error getting all habitats: $e', 'FishService', e);
       return [];
     }
   }
@@ -137,7 +212,7 @@ class FishService {
       sortedPreparations.sort();
       return sortedPreparations;
     } catch (e) {
-      print('Error getting all preparations: $e');
+      Logger.error('Error getting all preparations: $e', 'FishService', e);
       return [];
     }
   }
@@ -145,9 +220,14 @@ class FishService {
   /// Get fish count
   static Future<int> getFishCount() async {
     try {
-      return await _db.getFishCount();
+      if (kIsWeb) {
+        await _loadWebFishData();
+        return _webFishCache?.length ?? 0;
+      } else {
+        return await _db.getFishCount();
+      }
     } catch (e) {
-      print('Error getting fish count: $e');
+      Logger.error('Error getting fish count: $e', 'FishService', e);
       return 0;
     }
   }
@@ -155,9 +235,13 @@ class FishService {
   /// Check if database is initialized
   static Future<bool> isDatabaseInitialized() async {
     try {
-      return await _db.isDatabaseInitialized();
+      if (kIsWeb) {
+        return _isWebDataLoaded && _webFishCache != null && _webFishCache!.isNotEmpty;
+      } else {
+        return await _db.isDatabaseInitialized();
+      }
     } catch (e) {
-      print('Error checking database initialization: $e');
+      Logger.error('Error checking database initialization: $e', 'FishService', e);
       return false;
     }
   }
@@ -165,20 +249,26 @@ class FishService {
   /// Initialize database (mainly for first app launch)
   static Future<void> initializeDatabase() async {
     try {
-      print('Initializing fish database...');
-      
-      // The database will be automatically initialized when first accessed
-      // through the DatabaseHelper.instance.database getter
-      final isInitialized = await isDatabaseInitialized();
-      
-      if (isInitialized) {
-        final count = await getFishCount();
-        print('Database already initialized with $count fish species');
+      if (kIsWeb) {
+        Logger.info('Initializing fish data for web platform...', 'FishService');
+        await _loadWebFishData();
+        Logger.info('Web fish data initialized with ${_webFishCache?.length ?? 0} species', 'FishService');
       } else {
-        print('Database not initialized, will be created on first access');
+        Logger.info('Initializing fish database for mobile/desktop...', 'FishService');
+        
+        // The database will be automatically initialized when first accessed
+        // through the DatabaseHelper.instance.database getter
+        final isInitialized = await isDatabaseInitialized();
+        
+        if (isInitialized) {
+          final count = await getFishCount();
+          Logger.info('Database already initialized with $count fish species', 'FishService');
+        } else {
+          Logger.info('Database not initialized, will be created on first access', 'FishService');
+        }
       }
     } catch (e) {
-      print('Error initializing database: $e');
+      Logger.error('Error initializing database: $e', 'FishService', e);
       rethrow;
     }
   }
@@ -187,9 +277,9 @@ class FishService {
   static Future<void> reinitializeDatabase() async {
     try {
       await _db.reinitializeDatabase();
-      print('Database reinitialized successfully');
+      Logger.info('Database reinitialized successfully', 'FishService');
     } catch (e) {
-      print('Error reinitializing database: $e');
+      Logger.error('Error reinitializing database: $e', 'FishService', e);
       rethrow;
     }
   }
@@ -200,7 +290,7 @@ class FishService {
       final result = await _db.insertFish(fish);
       return result > 0;
     } catch (e) {
-      print('Error adding fish: $e');
+      Logger.error('Error adding fish: $e', 'FishService', e);
       return false;
     }
   }
@@ -211,7 +301,7 @@ class FishService {
       final result = await _db.updateFish(fish);
       return result > 0;
     } catch (e) {
-      print('Error updating fish: $e');
+      Logger.error('Error updating fish: $e', 'FishService', e);
       return false;
     }
   }
@@ -222,7 +312,7 @@ class FishService {
       final result = await _db.deleteFish(id);
       return result > 0;
     } catch (e) {
-      print('Error deleting fish: $e');
+      Logger.error('Error deleting fish: $e', 'FishService', e);
       return false;
     }
   }
@@ -238,7 +328,7 @@ class FishService {
       allFish.shuffle();
       return allFish.take(count).toList();
     } catch (e) {
-      print('Error getting random fish: $e');
+      Logger.error('Error getting random fish: $e', 'FishService', e);
       return [];
     }
   }
@@ -248,7 +338,7 @@ class FishService {
     try {
       await _db.close();
     } catch (e) {
-      print('Error closing database: $e');
+      Logger.error('Error closing database: $e', 'FishService', e);
     }
   }
 }

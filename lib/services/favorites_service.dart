@@ -1,6 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/fish.dart';
 import 'fish_service.dart';
+import '../utils/logger.dart';
 
 /// Service class for managing user's favorite fish
 /// 
@@ -16,7 +17,7 @@ class FavoritesService {
       final List<String> favoriteIds = prefs.getStringList(_favoritesKey) ?? [];
       return favoriteIds.toSet();
     } catch (e) {
-      print('Error getting favorite IDs: $e');
+      Logger.error('Error getting favorite IDs: $e', 'FavoritesService', e);
       return {};
     }
   }
@@ -27,7 +28,7 @@ class FavoritesService {
       final favoriteIds = await getFavoriteIds();
       return favoriteIds.contains(fishId);
     } catch (e) {
-      print('Error checking if fish is favorite: $e');
+      Logger.error('Error checking if fish is favorite: $e', 'FavoritesService', e);
       return false;
     }
   }
@@ -43,14 +44,14 @@ class FavoritesService {
         final success = await prefs.setStringList(_favoritesKey, favoriteIds.toList());
         
         if (success) {
-          print('Added fish $fishId to favorites');
+          Logger.info('Added fish $fishId to favorites', 'FavoritesService');
           return true;
         }
       }
       
       return false;
     } catch (e) {
-      print('Error adding fish to favorites: $e');
+      Logger.error('Error adding fish to favorites: $e', 'FavoritesService', e);
       return false;
     }
   }
@@ -66,14 +67,14 @@ class FavoritesService {
         final success = await prefs.setStringList(_favoritesKey, favoriteIds.toList());
         
         if (success) {
-          print('Removed fish $fishId from favorites');
+          Logger.info('Removed fish $fishId from favorites', 'FavoritesService');
           return true;
         }
       }
       
       return false;
     } catch (e) {
-      print('Error removing fish from favorites: $e');
+      Logger.error('Error removing fish from favorites: $e', 'FavoritesService', e);
       return false;
     }
   }
@@ -89,7 +90,7 @@ class FavoritesService {
         return await addToFavorites(fishId);
       }
     } catch (e) {
-      print('Error toggling favorite: $e');
+      Logger.error('Error toggling favorite: $e', 'FavoritesService', e);
       return false;
     }
   }
@@ -117,7 +118,7 @@ class FavoritesService {
       
       return favoriteFish;
     } catch (e) {
-      print('Error getting favorite fish: $e');
+      Logger.error('Error getting favorite fish: $e', 'FavoritesService', e);
       return [];
     }
   }
@@ -128,7 +129,7 @@ class FavoritesService {
       final favoriteIds = await getFavoriteIds();
       return favoriteIds.length;
     } catch (e) {
-      print('Error getting favorite count: $e');
+      Logger.error('Error getting favorite count: $e', 'FavoritesService', e);
       return 0;
     }
   }
@@ -140,12 +141,12 @@ class FavoritesService {
       final success = await prefs.remove(_favoritesKey);
       
       if (success) {
-        print('Cleared all favorites');
+        Logger.info('Cleared all favorites', 'FavoritesService');
       }
       
       return success;
     } catch (e) {
-      print('Error clearing favorites: $e');
+      Logger.error('Error clearing favorites: $e', 'FavoritesService', e);
       return false;
     }
   }
@@ -156,7 +157,7 @@ class FavoritesService {
       final favoriteIds = await getFavoriteIds();
       return favoriteIds.toList();
     } catch (e) {
-      print('Error exporting favorites: $e');
+      Logger.error('Error exporting favorites: $e', 'FavoritesService', e);
       return [];
     }
   }
@@ -178,12 +179,12 @@ class FavoritesService {
       final success = await prefs.setStringList(_favoritesKey, validIds);
       
       if (success) {
-        print('Imported ${validIds.length} favorites (${fishIds.length - validIds.length} invalid IDs skipped)');
+        Logger.info('Imported ${validIds.length} favorites (${fishIds.length - validIds.length} invalid IDs skipped)', 'FavoritesService');
       }
       
       return success;
     } catch (e) {
-      print('Error importing favorites: $e');
+      Logger.error('Error importing favorites: $e', 'FavoritesService', e);
       return false;
     }
   }
@@ -202,7 +203,7 @@ class FavoritesService {
       
       return addedCount;
     } catch (e) {
-      print('Error adding multiple to favorites: $e');
+      Logger.error('Error adding multiple to favorites: $e', 'FavoritesService', e);
       return 0;
     }
   }
@@ -222,7 +223,7 @@ class FavoritesService {
       
       return favoriteFish.sublist(favoriteFish.length - limit);
     } catch (e) {
-      print('Error getting recently added favorites: $e');
+      Logger.error('Error getting recently added favorites: $e', 'FavoritesService', e);
       return [];
     }
   }
